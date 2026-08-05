@@ -1,0 +1,10 @@
+{
+  "name": "zcap-spec",
+  "private": true,
+  "type": "module",
+  "description": "Authorization Capabilities (aka zcap) specification",
+  "scripts": {},
+  "workspaces": [
+    "json-schema"
+  ]
+}

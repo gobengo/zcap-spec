@@ -1,0 +1,347 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://w3id.org/zcap/v1/schema/zcap.schema.json",
+  "title": "Authorization Capability (ZCAP)",
+  "description": "JSON Schema for the JSON documents defined by the ZCAP specification (https://w3c-ccg.github.io/zcap-spec/): a bare/root Capability, a delegated Capability (a Capability Delegation), and a Capability Invocation. A document matches exactly one of these three shapes — see $defs.",
+  "oneOf": [
+    { "$ref": "#/$defs/Capability" },
+    { "$ref": "#/$defs/CapabilityDelegation" },
+    { "$ref": "#/$defs/CapabilityInvocation" }
+  ],
+  "$defs": {
+    "Capability": {
+      "title": "Capability",
+      "description": "A bare/root capability: a self-authorizing reference to an invocationTarget, implicitly trusted and unsigned. It has no parentCapability and no proof — a document with either of those is a Capability Delegation instead (see $defs/CapabilityDelegation).",
+      "type": "object",
+      "properties": {
+        "@context": { "$ref": "#/$defs/context" },
+        "id": {
+          "description": "The unique identifier (URI) for this capability. Root capabilities conventionally use the form 'urn:zcap:root:<url-encoded-invocationTarget>'.",
+          "type": "string",
+          "format": "uri"
+        },
+        "controller": { "$ref": "#/$defs/controller" },
+        "invocationTarget": { "$ref": "#/$defs/invocationTarget" },
+        "allowedAction": { "$ref": "#/$defs/allowedAction" },
+        "caveat": { "$ref": "#/$defs/caveatOrCaveats" }
+      },
+      "required": ["@context", "id", "controller", "invocationTarget"],
+      "additionalProperties": false
+    },
+    "CapabilityDelegation": {
+      "title": "Capability Delegation",
+      "description": "A capability that has been delegated from a parentCapability: it MUST carry expires and a proof whose proofPurpose is 'capabilityDelegation'.",
+      "type": "object",
+      "properties": {
+        "@context": { "$ref": "#/$defs/context" },
+        "id": {
+          "description": "The unique identifier (URI) for this delegated capability, typically a UUID URN or other unique URI.",
+          "type": "string",
+          "format": "uri"
+        },
+        "controller": { "$ref": "#/$defs/controller" },
+        "invocationTarget": { "$ref": "#/$defs/invocationTarget" },
+        "parentCapability": {
+          "description": "The URI (id) of the capability from which this capability was delegated.",
+          "type": "string",
+          "format": "uri"
+        },
+        "expires": {
+          "description": "An XML Schema dateTime string (UTC, e.g. 2021-11-03T18:33:51Z) indicating when this delegated capability expires.",
+          "type": "string",
+          "format": "date-time"
+        },
+        "allowedAction": { "$ref": "#/$defs/allowedAction" },
+        "caveat": { "$ref": "#/$defs/caveatOrCaveats" },
+        "proof": {
+          "description": "A cryptographic proof (e.g. a Data Integrity proof), or an array of them, created by the delegator's key, with proofPurpose 'capabilityDelegation'.",
+          "oneOf": [
+            { "$ref": "#/$defs/delegationProof" },
+            {
+              "type": "array",
+              "items": { "$ref": "#/$defs/delegationProof" },
+              "minItems": 1
+            }
+          ]
+        }
+      },
+      "required": ["@context", "id", "controller", "parentCapability", "expires", "proof"],
+      "additionalProperties": false
+    },
+    "CapabilityInvocation": {
+      "title": "Capability Invocation",
+      "description": "An invocation of a capability: a request/assertion to perform an action against a capability's invocationTarget, authorized by a proof whose proofPurpose is 'capabilityInvocation' and whose 'capability' property references the capability (by id) being invoked.",
+      "type": "object",
+      "properties": {
+        "@context": { "$ref": "#/$defs/context" },
+        "id": {
+          "description": "A unique identifier (URI), often a UUID URN, for this invocation (helps prevent replay).",
+          "type": "string",
+          "format": "uri"
+        },
+        "invocationTarget": { "$ref": "#/$defs/invocationTarget" },
+        "action": {
+          "description": "The action being invoked (e.g. 'read', 'write', 'Drive'). Some deployments instead (or additionally) use 'capabilityAction'.",
+          "type": "string"
+        },
+        "capabilityAction": {
+          "description": "The action being invoked; an alternate/legacy property name for 'action' used by some deployments.",
+          "type": "string"
+        },
+        "proof": {
+          "description": "A cryptographic proof, or an array of them, created by the invoker's key, with proofPurpose 'capabilityInvocation' and a 'capability' reference to the capability being invoked.",
+          "oneOf": [
+            { "$ref": "#/$defs/invocationProof" },
+            {
+              "type": "array",
+              "items": { "$ref": "#/$defs/invocationProof" },
+              "minItems": 1
+            }
+          ]
+        }
+      },
+      "required": ["@context", "id", "proof"],
+      "additionalProperties": false
+    },
+    "context": {
+      "description": "JSON-LD context(s). MUST include the zcap context; capability delegations and invocations typically also include a cryptosuite context used by 'proof'.",
+      "oneOf": [
+        {
+          "type": "string",
+          "const": "https://w3id.org/zcap/v1"
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": ["string", "object"]
+          },
+          "contains": {
+            "const": "https://w3id.org/zcap/v1"
+          },
+          "minItems": 1
+        }
+      ]
+    },
+    "controller": {
+      "description": "One or more URIs identifying the entity or entities authorized to invoke (or further delegate) this capability. Often a did: URI or a verification method / key URI.",
+      "oneOf": [
+        {
+          "type": "string",
+          "format": "uri"
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uri"
+          },
+          "minItems": 1
+        }
+      ]
+    },
+    "invocationTarget": {
+      "description": "The URI of the resource, or the object describing the resource, that a capability may be invoked against.",
+      "oneOf": [
+        {
+          "type": "string",
+          "format": "uri"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "format": "uri"
+            },
+            "type": {
+              "type": "string"
+            }
+          },
+          "required": ["id"]
+        }
+      ]
+    },
+    "allowedAction": {
+      "description": "One or more actions this capability authorizes when invoked. If omitted, all actions available on the invocationTarget are allowed. A delegated capability's allowedAction MUST be equal to, or a subset of, its parent's allowedAction.",
+      "oneOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      ]
+    },
+    "caveat": {
+      "type": "object",
+      "description": "A caveat further restricting how/when a capability may be invoked (e.g. a validity period, allowed IP range, required multi-invocation, etc). The 'type' identifies the caveat's semantics; other properties are caveat-specific.",
+      "properties": {
+        "type": {
+          "type": "string",
+          "description": "The type of caveat, e.g. 'ValidUntil', 'AllowedTarget', etc."
+        }
+      },
+      "required": ["type"],
+      "additionalProperties": true
+    },
+    "caveatOrCaveats": {
+      "description": "One or more caveats (additional conditions/restrictions) that must be satisfied for the capability to be considered valid when invoked.",
+      "oneOf": [
+        { "$ref": "#/$defs/caveat" },
+        {
+          "type": "array",
+          "items": { "$ref": "#/$defs/caveat" },
+          "minItems": 1
+        }
+      ]
+    },
+    "delegationProof": {
+      "type": "object",
+      "description": "A Data Integrity (or similar) cryptographic proof object attached to a Capability Delegation.",
+      "properties": {
+        "type": {
+          "type": "string",
+          "description": "The cryptographic suite used to create the proof, e.g. 'Ed25519Signature2020'."
+        },
+        "created": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when the proof was created."
+        },
+        "verificationMethod": {
+          "type": "string",
+          "format": "uri",
+          "description": "URI of the key/verification method used to create the proof."
+        },
+        "proofPurpose": {
+          "type": "string",
+          "const": "capabilityDelegation",
+          "description": "MUST be 'capabilityDelegation' for a Capability Delegation's proof."
+        },
+        "capabilityChain": {
+          "type": "array",
+          "description": "The chain of capabilities (root through immediate parent) that authorize this delegation. Each entry is either a capability id (URI) or, for the parent, the full embedded capability object.",
+          "items": {
+            "oneOf": [
+              { "type": "string", "format": "uri" },
+              { "type": "object" }
+            ]
+          },
+          "minItems": 1
+        },
+        "proofValue": {
+          "type": "string",
+          "description": "The encoded signature value (e.g. multibase-encoded)."
+        },
+        "jws": {
+          "type": "string",
+          "description": "A detached JWS signature value, used by some cryptosuites instead of proofValue."
+        }
+      },
+      "required": ["type", "created", "verificationMethod", "proofPurpose"],
+      "additionalProperties": true
+    },
+    "invocationProof": {
+      "type": "object",
+      "description": "A Data Integrity (or similar) cryptographic proof object attached to a Capability Invocation.",
+      "properties": {
+        "type": {
+          "type": "string",
+          "description": "The cryptographic suite used to create the proof, e.g. 'Ed25519Signature2020' (modern) or 'RsaSignature2016' (legacy)."
+        },
+        "created": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when the proof was created."
+        },
+        "verificationMethod": {
+          "type": "string",
+          "format": "uri",
+          "description": "URI of the key/verification method used to create the proof."
+        },
+        "creator": {
+          "type": "string",
+          "format": "uri",
+          "description": "Legacy/alternate property naming the key used to create the proof, used instead of 'verificationMethod' by some (e.g. older RsaSignature2016-style) proofs."
+        },
+        "proofPurpose": {
+          "type": "string",
+          "const": "capabilityInvocation",
+          "description": "MUST be 'capabilityInvocation' for a Capability Invocation's proof."
+        },
+        "capability": {
+          "type": "string",
+          "format": "uri",
+          "description": "The id (URI) of the capability being invoked."
+        },
+        "capabilityAction": {
+          "type": "string",
+          "description": "The action being invoked against the capability, when not specified at the top level of the invocation."
+        },
+        "proofValue": {
+          "type": "string",
+          "description": "The encoded signature value (e.g. multibase-encoded)."
+        },
+        "jws": {
+          "type": "string",
+          "description": "A detached JWS signature value, used by some cryptosuites instead of proofValue."
+        },
+        "signatureValue": {
+          "type": "string",
+          "description": "Legacy/alternate property naming the encoded signature value, used instead of 'proofValue'/'jws' by some (e.g. older RsaSignature2016-style) proofs."
+        }
+      },
+      "required": ["type", "proofPurpose", "capability"],
+      "additionalProperties": true
+    }
+  },
+  "examples": [
+    {
+      "@context": "https://w3id.org/zcap/v1",
+      "id": "urn:zcap:root:https%3A%2F%2Fexample.com%2Ffoo",
+      "controller": "did:key:example",
+      "invocationTarget": "https://example.com/foo"
+    },
+    {
+      "@context": [
+        "https://w3id.org/zcap/v1",
+        "https://w3id.org/security/suites/ed25519-2020/v1"
+      ],
+      "id": "urn:uuid:cdc77118-6bfa-11ec-aceb-10bf48838a41",
+      "parentCapability": "urn:zcap:root:https%3A%2F%2Fexample.com%2Ffoo",
+      "controller": "did:key:example",
+      "invocationTarget": "https://example.com/foo",
+      "expires": "2021-11-03T18:33:51Z",
+      "allowedAction": ["write", "read"],
+      "proof": {
+        "type": "Ed25519Signature2020",
+        "created": "2021-10-27T18:33:51Z",
+        "verificationMethod": "did:key:z6MkfWKcvBiKCfNgz5UUGseNt37t4dguEvFgJ9XvX2UV6zB9#z6MkfWKcvBiKCfNgz5UUGseNt37t4dguEvFgJ9XvX2UV6zB9",
+        "proofPurpose": "capabilityDelegation",
+        "capabilityChain": ["urn:zcap:root:https%3A%2F%2Fexample.com%2Ffoo"],
+        "proofValue": "z3t9BCQyF21MDVYmLKc9zbLreqx4wBtQnUsd5aqyoWS5FfhapRz7QjPNLcgKAornUVmJR4ZjbGpuxRFnffxX1ZjtF"
+      }
+    },
+    {
+      "@context": [
+        "https://w3id.org/zcap/v1",
+        "https://w3id.org/security/suites/ed25519-2020/v1"
+      ],
+      "id": "urn:uuid:ad86cb2c-e9db-434a-beae-71b82120a8a4",
+      "action": "Drive",
+      "proof": {
+        "type": "Ed25519Signature2020",
+        "created": "2016-02-08T17:13:48Z",
+        "verificationMethod": "did:key:z6MkfWKcvBiKCfNgz5UUGseNt37t4dguEvFgJ9XvX2UV6zB9#z6MkfWKcvBiKCfNgz5UUGseNt37t4dguEvFgJ9XvX2UV6zB9",
+        "proofPurpose": "capabilityInvocation",
+        "capability": "https://whatacar.example/a-fancy-car/proc/7a397d7b",
+        "proofValue": "z3t9BCQyF21MDVYmLKc9zbLreqx4wBtQnUsd5aqyoWS5FfhapRz7QjPNLcgKAornUVmJR4ZjbGpuxRFnffxX1ZjtF"
+      }
+    }
+  ]
+}

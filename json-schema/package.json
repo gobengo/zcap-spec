@@ -1,0 +1,17 @@
+{
+  "name": "zcap-spec-json-schema",
+  "private": true,
+  "type": "module",
+  "description": "Authorization Capabilities (aka zcap) specification",
+  "scripts": {
+    "validate": "node validate.ts",
+    "typecheck": "npx tsc --noEmit"
+  },
+  "dependencies": {
+    "@cfworker/json-schema": "^4.1.1",
+    "strip-json-comments": "^5.0.3"
+  },
+  "devDependencies": {
+    "@types/node": "^26.1.2"
+  }
+}
