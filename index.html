@@ -1420,7 +1420,7 @@ urn:uuid:{uuid}
         </p>
 
         <section id="milestone-v0.4">
-            <h3>v0.4: Readability Improvements, Accurate Examples</h3>
+            <h3>v0.4: Improved Readability, Accurate Examples</h3>
             <p>
               There will be no normative changes in v0.4.
             </p>
@@ -1443,7 +1443,9 @@ urn:uuid:{uuid}
                   deferring for the reader any discussion of planning how the spec may change tomorrow,
                   so new readers can understand the basics quickly.
 
-                  Instead, discussion of future work is moved from parentheticals to a <a href="#backlog">section</a> where the future work can be prioritized into a plan. 
+                  Instead, discussion of future work is moved from parentheticals to a <a href="#backlog">section</a> where the future work can be prioritized into a plan.
+
+                  This resolved <a href="https://github.com/w3c-ccg/zcap-spec/issues/56">issue 56</a>.
                 </p>
               </li>
               <li>
@@ -1465,13 +1467,6 @@ urn:uuid:{uuid}
                 which use the property named proofValue (instead of the formerly used signatureValue) for the output of cryptosuite.
               </li>
             </ul>
-
-            <p>Plan for v0.4.x</p>
-            <ol>
-                <li class="issue" data-number="56">
-                    Remove TODOs expressed as spec text so the spec is more readable, and all issues are tracked in the issue tracker
-                </li>
-            </ol>
         </section>
 
         <section>
@@ -1496,19 +1491,29 @@ urn:uuid:{uuid}
               >
               <p>
                 Add more details to the requirements on delegation proof property.
+              </p>
 
+              <p>The current text says:</p>
+              <blockquote>
+                A delegated zcap MUST have a proof field that is an object or an array of objects that each express a DI proof. At least one of these proofs MUST be a zcap capability delegation proof.
+              </blockquote>
+
+              <p>
                 Consider linking to
                 <a href="https://www.w3.org/TR/vc-data-integrity-1.1/">
                   vc-data-integrity-1.1
                 </a>.
               </p>
-              <blockquote>
-                A delegated zcap MUST have a proof field that is an object or an array of objects that each express a DI proof. At least one of these proofs MUST be a zcap capability delegation proof.
-              </blockquote>
-            </div>
 
-            <div class="issue">
-                v0.3 was published in 2022. Since then, some implementors have made changes to their implementations based on their experience in production, which may be incorporated into this spec. If this experience can be described, and the changes articulated, they may be incorporated into this document.
+              <p>
+                Consider adding an explicit option ("MAY") to use proofs of type DataIntegrityProof.
+                This may justify defining DataIntegrityProof in the zcap JSON-LD context.
+              </p>
+
+              <p>
+                Consider moving normative text defining "capability delegation proof" out of the introduction section and into a section about delegations.
+                This will slim down the introduction section, and let us add even more normative text for capability delegations in the new section.
+              </p>
             </div>
 
             <div class="issue"
@@ -1518,6 +1523,10 @@ urn:uuid:{uuid}
                 Detail algorithm for validation process:
                 https://github.com/digitalbazaar/zcapld/blob/4386185f784f552d6eaeb2c3c82959cb2e09762e/lib/CapabilityProofPurpose.js#L85
               </p>              
+            </div>
+
+            <div class="issue">
+                v0.3 was published in 2022. Since then, some implementors have made changes to their implementations based on their experience in production, which may be incorporated into this spec. If this experience can be described, and the changes articulated, they may be incorporated into this document.
             </div>
 
             <div class="issue"
@@ -1575,6 +1584,7 @@ urn:uuid:{uuid}
           <p>
             We should consider mitigating this by using a respec plugin that renders JSON examples so the initial render doesn't take up as much vertical space as the full JSON value serialized with newlines.
             For example, the plugin could collapse or minimize some values unless the end-user clicks to expand and show a fuller example that takes up more space.
+            A proof of concept is at <a href="https://gobengo.github.io/respec-collapsible-json/">https://gobengo.github.io/respec-collapsible-json/</a>.
           </p>
         </div>
     </section>
