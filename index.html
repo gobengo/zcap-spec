@@ -648,7 +648,7 @@
         </p>
       </div>
 
-            <section id="root-capability">
+      <section id="root-capability">
         <h2>Root Capability</h2>
         <p>
           A root zcap looks like this:
@@ -796,7 +796,7 @@ urn:zcap:root:${encodeURIComponent(invocationTarget)}
         </section>
       </section>
 
-      <section id="capability delegation">
+      <section id="capability-delegation">
         <h2>Capability Delegation</h2>
         <p>
           A capability document that is not the target MUST also have a
@@ -1224,35 +1224,37 @@ urn:uuid:{uuid}
             gzipping the result, and then base64url-encoding the gzipped JSON.
           </p>
 
-          <section id="Example Invocation HTTP">
-            <h4>Example Invocation HTTP request with trailing headers</h4>
-            <figure id="fig-example-invocation-http">
-              <figcaption>
-                This is an example of how a capability invocation request may be serialized as message/http using trailing headers.
-                This enables deferral of generating a digest and signature until after all data has been transmitted.
-              </figcaption>
-              <pre class="example http" title="Invocation HTTP Request with Trailing Headers">
-  POST /api/v1/example HTTP/1.1
-  Host: example.com
-  Date: Tue, 25 Aug 2026 00:00:00 GMT
-  Content-Type: application/json
-  TE: trailers
-  Trailer: Capability-Invocation, Content-Digest, Signature-Input, Signature
-  Transfer-Encoding: chunked
-
-  1B
-  {"type":"ExampleApiAction"}
-  0
-  Capability-Invocation: zcap capability={base64url(gzip(json(capability)))}
-  Content-Digest: sha-256=:y6p4T1s616oH+n04bZ9NzPzqB2qR+B/T3V7V9XN6b4Y=:
-  Signature-Input: zcap=("@method" "@path" "capability-invocation" "content-digest" "content-type");alg="ed25519";created=1798294620;keyid="did:example:alice#key-1"
-  Signature: zcap=:m28+dfHk1Pq6VvKxFxX9Q9zNz98bX5cKldP1M0zNzM3NzUzNzdXNzr1PzM3NzUzNzUzNzr1PzM3NzUzNzUzNzM3NzA==:
-
-              </pre>
-            </figure>
-          </section>
-
         </section>
+
+
+        <section id="example-invocation-http">
+          <h3>Example Invocation HTTP Requests</h3>
+          <figure id="fig-example-invocation-http">
+            <figcaption>
+              This is an example of how a capability invocation request may be serialized as message/http using trailing headers.
+              This enables deferral of generating a digest and signature until after all data has been transmitted.
+            </figcaption>
+            <pre class="example http" title="Invocation HTTP Request with Trailing Headers">
+POST /api/v1/example HTTP/1.1
+Host: example.com
+Date: Tue, 25 Aug 2026 00:00:00 GMT
+Content-Type: application/json
+TE: trailers
+Trailer: Capability-Invocation, Content-Digest, Signature-Input, Signature
+Transfer-Encoding: chunked
+
+1B
+{"type":"ExampleApiAction"}
+0
+Capability-Invocation: zcap capability={base64url(gzip(json(capability)))}
+Content-Digest: sha-256=:y6p4T1s616oH+n04bZ9NzPzqB2qR+B/T3V7V9XN6b4Y=:
+Signature-Input: zcap=("@method" "@path" "capability-invocation" "content-digest" "content-type");alg="ed25519";created=1798294620;keyid="did:example:alice#key-1"
+Signature: zcap=:m28+dfHk1Pq6VvKxFxX9Q9zNz98bX5cKldP1M0zNzM3NzUzNzdXNzr1PzM3NzUzNzUzNzr1PzM3NzUzNzUzNzM3NzA==:
+
+            </pre>
+          </figure>
+        </section>
+
 
       </section>
 
@@ -1267,7 +1269,7 @@ urn:uuid:{uuid}
         </p>
 
         <section id="invocation-json-proof">
-          <h3>Invocation DataIntegrityProofs</h3>
+          <h3>Invocation JSON `proof`</h3>
 
           <p>
             When invoking using a DI proof, a capability invocation proof must
@@ -1285,7 +1287,7 @@ urn:uuid:{uuid}
           </p>
 
 
-          <figure>
+          <figure id="example-invocation-json">
             <figcaption>
               An example of how a capability invocation may be serialized as application/json.
             </figcaption>
@@ -1492,7 +1494,7 @@ urn:uuid:{uuid}
         </p>
 
         <section id="milestone-v0.4">
-            <h3>v0.4: Readability Improvements, Accurate Examples</h3>
+            <h3>v0.4: Improved Readability, Accurate Examples</h3>
             <p>
               There will be no normative changes in v0.4.
             </p>
@@ -1515,7 +1517,9 @@ urn:uuid:{uuid}
                   deferring for the reader any discussion of planning how the spec may change tomorrow,
                   so new readers can understand the basics quickly.
 
-                  Instead, discussion of future work is moved from parentheticals to a <a href="#backlog">section</a> where the future work can be prioritized into a plan. 
+                  Instead, discussion of future work is moved from parentheticals to a <a href="#backlog">section</a> where the future work can be prioritized into a plan.
+
+                  This resolved <a href="https://github.com/w3c-ccg/zcap-spec/issues/56">issue 56</a>.
                 </p>
               </li>
               <li>
@@ -1536,14 +1540,33 @@ urn:uuid:{uuid}
                 Replace with proofs of type <a href="https://www.w3.org/TR/vc-data-integrity/#dataintegrityproof">DataIntegrityProof</a>,
                 which use the property named proofValue (instead of the formerly used signatureValue) for the output of cryptosuite.
               </li>
-            </ul>
 
-            <p>Plan for v0.4.x</p>
-            <ol>
-                <li class="issue" data-number="56">
-                    Remove TODOs expressed as spec text so the spec is more readable, and all issues are tracked in the issue tracker
-                </li>
-            </ol>
+              <li>
+                Moved section on
+                <a href="#capabilities-vs-ACLs">Capabilities vs. Access Control Lists</a>
+                from the <a href="#introduction">Introduction</a>
+                to
+                <a href="#capabilities-vs-ACLs">Capabilities</a>.
+                This keeps the introduction short. The full section on comparison with ACLs does not need to be in the introduction.
+              </li>
+
+              <li>
+                Added <a href="#invocation-http-request">Invocation HTTP Request</a>.
+                This establishes a clearly-named section in the Table of Contents offering accesses a reference description of how an invocation may be represented as an HTTP Request.
+              </li>
+
+              <li>
+                Added <a href="#invocation-json">Invocation JSON</a> and <a href="#invocation-http-request">Invocation HTTP Request</a>,
+                This establishes a clearly-named section in the Table of Contents offering accesses for reference description of how an invocation may be represented as JSON.
+              </li>
+
+              <li>
+                Added <a href="#example-invocation-http">Example Invocation HTTP request with trailing headers</a>.
+                Previously, there were no examples of how an invocation is expressed as an HTTP request.
+                The new example illustrates the general form of the invocation request much more quickly and clearly than the previous text-only description.
+              </li>
+
+            </ul>
         </section>
 
         <section>
@@ -1568,19 +1591,29 @@ urn:uuid:{uuid}
               >
               <p>
                 Add more details to the requirements on delegation proof property.
+              </p>
 
+              <p>The current text says:</p>
+              <blockquote>
+                A delegated zcap MUST have a proof field that is an object or an array of objects that each express a DI proof. At least one of these proofs MUST be a zcap capability delegation proof.
+              </blockquote>
+
+              <p>
                 Consider linking to
                 <a href="https://www.w3.org/TR/vc-data-integrity-1.1/">
                   vc-data-integrity-1.1
                 </a>.
               </p>
-              <blockquote>
-                A delegated zcap MUST have a proof field that is an object or an array of objects that each express a DI proof. At least one of these proofs MUST be a zcap capability delegation proof.
-              </blockquote>
-            </div>
 
-            <div class="issue">
-                v0.3 was published in 2022. Since then, some implementors have made changes to their implementations based on their experience in production, which may be incorporated into this spec. If this experience can be described, and the changes articulated, they may be incorporated into this document.
+              <p>
+                Consider adding an explicit option ("MAY") to use proofs of type DataIntegrityProof.
+                This may justify defining DataIntegrityProof in the zcap JSON-LD context.
+              </p>
+
+              <p>
+                Consider moving normative text defining "capability delegation proof" out of the introduction section and into a section about delegations.
+                This will slim down the introduction section, and let us add even more normative text for capability delegations in the new section.
+              </p>
             </div>
 
             <div class="issue"
@@ -1590,6 +1623,18 @@ urn:uuid:{uuid}
                 Detail algorithm for validation process:
                 https://github.com/digitalbazaar/zcapld/blob/4386185f784f552d6eaeb2c3c82959cb2e09762e/lib/CapabilityProofPurpose.js#L85
               </p>              
+            </div>
+
+            <div class="issue" title='Reconsider "URL Path- or Query-based Attenuation"'>
+              Consider a change to remove the entirety of this kind of implicit authority via URL structure.
+              
+              If that is objectionable, then we should
+              add a security consideration documenting risks of verifiers using the feature
+              and document the use case that justifies it, so other solutions can be considered to satisfy it.
+            </div>
+
+            <div class="issue">
+                v0.3 was published in 2022. Since then, some implementors have made changes to their implementations based on their experience in production, which may be incorporated into this spec. If this experience can be described, and the changes articulated, they may be incorporated into this document.
             </div>
 
             <div class="issue"
@@ -1647,6 +1692,7 @@ urn:uuid:{uuid}
           <p>
             We should consider mitigating this by using a respec plugin that renders JSON examples so the initial render doesn't take up as much vertical space as the full JSON value serialized with newlines.
             For example, the plugin could collapse or minimize some values unless the end-user clicks to expand and show a fuller example that takes up more space.
+            A proof of concept is at <a href="https://gobengo.github.io/respec-collapsible-json/">https://gobengo.github.io/respec-collapsible-json/</a>.
           </p>
         </div>
     </section>
