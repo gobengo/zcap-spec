@@ -67,7 +67,7 @@ jobs:
           # For a pull request build, add `-pr.N` to prerelease part
           # so `v0.4.0-draft` on PR 52 becomes `v0.4.0-pr.52`.
           if [ -n "${PR_NUMBER:-}" ] && [ -z "${INPUT_VERSION:-}" ]; then
-            versionNoBuild="${versionNoBuild%%+*}"
+            versionNoBuild="${version%%+*}"
             version="${versionNoBuild}-pr.${PR_NUMBER}"
           fi
 
