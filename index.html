@@ -1224,35 +1224,37 @@ urn:uuid:{uuid}
             gzipping the result, and then base64url-encoding the gzipped JSON.
           </p>
 
-          <section id="example-invocation-http">
-            <h4>Example Invocation HTTP request with trailing headers</h4>
-            <figure id="fig-example-invocation-http">
-              <figcaption>
-                This is an example of how a capability invocation request may be serialized as message/http using trailing headers.
-                This enables deferral of generating a digest and signature until after all data has been transmitted.
-              </figcaption>
-              <pre class="example http" title="Invocation HTTP Request with Trailing Headers">
-  POST /api/v1/example HTTP/1.1
-  Host: example.com
-  Date: Tue, 25 Aug 2026 00:00:00 GMT
-  Content-Type: application/json
-  TE: trailers
-  Trailer: Capability-Invocation, Content-Digest, Signature-Input, Signature
-  Transfer-Encoding: chunked
-
-  1B
-  {"type":"ExampleApiAction"}
-  0
-  Capability-Invocation: zcap capability={base64url(gzip(json(capability)))}
-  Content-Digest: sha-256=:y6p4T1s616oH+n04bZ9NzPzqB2qR+B/T3V7V9XN6b4Y=:
-  Signature-Input: zcap=("@method" "@path" "capability-invocation" "content-digest" "content-type");alg="ed25519";created=1798294620;keyid="did:example:alice#key-1"
-  Signature: zcap=:m28+dfHk1Pq6VvKxFxX9Q9zNz98bX5cKldP1M0zNzM3NzUzNzdXNzr1PzM3NzUzNzUzNzr1PzM3NzUzNzUzNzM3NzA==:
-
-              </pre>
-            </figure>
-          </section>
-
         </section>
+
+
+        <section id="example-invocation-http">
+          <h3>Example Invocation HTTP Requests</h3>
+          <figure id="fig-example-invocation-http">
+            <figcaption>
+              This is an example of how a capability invocation request may be serialized as message/http using trailing headers.
+              This enables deferral of generating a digest and signature until after all data has been transmitted.
+            </figcaption>
+            <pre class="example http" title="Invocation HTTP Request with Trailing Headers">
+POST /api/v1/example HTTP/1.1
+Host: example.com
+Date: Tue, 25 Aug 2026 00:00:00 GMT
+Content-Type: application/json
+TE: trailers
+Trailer: Capability-Invocation, Content-Digest, Signature-Input, Signature
+Transfer-Encoding: chunked
+
+1B
+{"type":"ExampleApiAction"}
+0
+Capability-Invocation: zcap capability={base64url(gzip(json(capability)))}
+Content-Digest: sha-256=:y6p4T1s616oH+n04bZ9NzPzqB2qR+B/T3V7V9XN6b4Y=:
+Signature-Input: zcap=("@method" "@path" "capability-invocation" "content-digest" "content-type");alg="ed25519";created=1798294620;keyid="did:example:alice#key-1"
+Signature: zcap=:m28+dfHk1Pq6VvKxFxX9Q9zNz98bX5cKldP1M0zNzM3NzUzNzdXNzr1PzM3NzUzNzUzNzr1PzM3NzUzNzUzNzM3NzA==:
+
+            </pre>
+          </figure>
+        </section>
+
 
       </section>
 
@@ -1285,7 +1287,7 @@ urn:uuid:{uuid}
           </p>
 
 
-          <figure>
+          <figure id="example-invocation-json">
             <figcaption>
               An example of how a capability invocation may be serialized as application/json.
             </figcaption>
