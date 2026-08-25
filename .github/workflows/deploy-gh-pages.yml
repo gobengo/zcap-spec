@@ -1,24 +1,15 @@
 # Publish the spec to the `gh-pages` branch under a version prefix.
 #
 # The version comes from the <title> element of index.html, e.g.
-# `<title>Authorization Capabilities v0.4.0-draft</title>` publishes to
+# it might publish to
 # `gh-pages:/v0.4.0-draft/` and is served at
 # <https://OWNER.github.io/zcap-spec/v0.4.0-draft/>.
 #
 # The root index.html of gh-pages is regenerated on every deploy: it lists all
 # published versions and redirects to the latest non-pull-request one.
-#
-# Runs automatically on every push to `main`, and on demand via the Actions UI
-# (where the version prefix can be overridden).
 name: Deploy to gh-pages
 
 on:
-  # Every push to main republishes the prefix named by the <title> of
-  # index.html. Bumping the version in the title is therefore what "cuts" a new
-  # directory; pushes that leave the title alone overwrite the current one.
-  push:
-    branches: [main]
-
   workflow_dispatch:
     inputs:
       version:
@@ -30,34 +21,6 @@ on:
         required: false
         default: true
         type: boolean
-
-  # ---------------------------------------------------------------------------
-  # Planned: preview deploys for pull requests targeting `main`, published to a
-  # prefix derived from the PR number, e.g. `v0.4.0-pr.52`. The version step
-  # below already handles this; enabling it is uncommenting this trigger.
-  #
-  # Read this before you do:
-  #
-  #   * `pull_request` from a *fork* gives GITHUB_TOKEN read-only permissions,
-  #     so the push to gh-pages will fail. Only same-repo branches work.
-  #   * `pull_request_target` would have write permissions, but it runs the
-  #     workflow definition from the *base* branch with secrets available while
-  #     checking out untrusted head code -- only safe if the job never executes
-  #     anything from the PR (this workflow copies files verbatim and runs no
-  #     build, which is the reason it can be made safe at all) AND is gated on
-  #     an authorization check, e.g. requiring the `deploy-preview` label or
-  #     `github.event.pull_request.author_association` in
-  #     OWNER/MEMBER/COLLABORATOR.
-  #   * The alternative, and the safer default, is the `workflow_run` pattern:
-  #     an untrusted `pull_request` job uploads an artifact, and a separate
-  #     trusted workflow on `workflow_run: completed` downloads and publishes it.
-  #   * Add a companion workflow on `pull_request: [closed]` to delete the
-  #     `v*-pr.N` directory, or gh-pages accumulates dead previews.
-  #
-  # pull_request:
-  #   types: [opened, synchronize, reopened]
-  #   branches: [main]
-  # ---------------------------------------------------------------------------
 
 permissions:
   contents: write
@@ -101,12 +64,11 @@ jobs:
             *) version="v$version" ;;
           esac
 
-          # For a pull request build, replace any prerelease part with `pr.N`,
+          # For a pull request build, add `-pr.N` to prerelease part
           # so `v0.4.0-draft` on PR 52 becomes `v0.4.0-pr.52`.
           if [ -n "${PR_NUMBER:-}" ] && [ -z "${INPUT_VERSION:-}" ]; then
-            core="${version%%-*}"
-            core="${core%%+*}"
-            version="${core}-pr.${PR_NUMBER}"
+            versionNoBuild="${version%%+*}"
+            version="${versionNoBuild}-pr.${PR_NUMBER}"
           fi
 
           # Reject anything that is not a plain semver -- this string becomes a
