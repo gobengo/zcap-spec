@@ -796,7 +796,7 @@ urn:zcap:root:${encodeURIComponent(invocationTarget)}
         </section>
       </section>
 
-      <section id="capability delegation">
+      <section id="capability-delegation">
         <h2>Capability Delegation</h2>
         <p>
           A capability document that is not the target MUST also have a
@@ -1224,7 +1224,7 @@ urn:uuid:{uuid}
             gzipping the result, and then base64url-encoding the gzipped JSON.
           </p>
 
-          <section id="Example Invocation HTTP">
+          <section id="example-invocation-http">
             <h4>Example Invocation HTTP request with trailing headers</h4>
             <figure id="fig-example-invocation-http">
               <figcaption>
@@ -1538,6 +1538,7 @@ urn:uuid:{uuid}
                 Replace with proofs of type <a href="https://www.w3.org/TR/vc-data-integrity/#dataintegrityproof">DataIntegrityProof</a>,
                 which use the property named proofValue (instead of the formerly used signatureValue) for the output of cryptosuite.
               </li>
+
               <li>
                 Moved section on
                 <a href="#capabilities-vs-ACLs">Capabilities vs. Access Control Lists</a>
@@ -1546,6 +1547,13 @@ urn:uuid:{uuid}
                 <a href="#capabilities-vs-ACLs">Capabilities</a>.
                 This keeps the introduction short. The full section on comparison with ACLs does not need to be in the introduction.
               </li>
+
+              <li>
+                Added <a href="#example-invocation-http">Example Invocation HTTP request with trailing headers</a>.
+                Previously, there were no examples of how an invocation is expressed as an HTTP request.
+                The new example illustrates the general form of the invocation request much more quickly and clearly than the previous text-only description.
+              </li>
+
             </ul>
         </section>
 
