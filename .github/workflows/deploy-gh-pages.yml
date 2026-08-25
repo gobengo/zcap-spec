@@ -7,9 +7,18 @@
 #
 # The root index.html of gh-pages is regenerated on every deploy: it lists all
 # published versions and redirects to the latest non-pull-request one.
+#
+# Runs automatically on every push to `main`, and on demand via the Actions UI
+# (where the version prefix can be overridden).
 name: Deploy to gh-pages
 
 on:
+  # Every push to main republishes the prefix named by the <title> of
+  # index.html. Bumping the version in the title is therefore what "cuts" a new
+  # directory; pushes that leave the title alone overwrite the current one.
+  push:
+    branches: [main]
+
   workflow_dispatch:
     inputs:
       version:
@@ -53,7 +62,10 @@ on:
 permissions:
   contents: write
 
-# Serialize deploys: concurrent runs would race on pushing gh-pages.
+# Serialize deploys: concurrent runs would race on pushing gh-pages. With
+# cancel-in-progress false, rapid pushes to main queue instead of racing, and
+# GitHub drops superseded pending runs -- fine here, since each run republishes
+# the whole prefix from its own checkout and the last one wins.
 concurrency:
   group: gh-pages-deploy
   cancel-in-progress: false
@@ -144,7 +156,11 @@ jobs:
           ls -la "gh-pages/${VERSION}"
 
       - name: Regenerate root index
-        if: inputs.update_root_index != false
+        # Always regenerate, except when a manual run explicitly opts out.
+        # Do NOT write this as `inputs.update_root_index != false`: on a push
+        # event `inputs.update_root_index` is null, and GitHub casts both null
+        # and false to 0, so that comparison is false and the step is skipped.
+        if: github.event_name != 'workflow_dispatch' || inputs.update_root_index
         run: src/.github/scripts/gh-pages-index.sh gh-pages
 
       - name: Commit and push
