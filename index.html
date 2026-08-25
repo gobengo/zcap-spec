@@ -500,155 +500,8 @@
         </p>
       </section>
 
-      <section id="root-capability">
-        <h2>Root Capability</h2>
-        <p>
-          A root zcap looks like this:
-        </p>
-
-        <pre class="example highlight javascript">
-{
-  "@context": "https://w3id.org/zcap/v1",
-  "id": "urn:zcap:root:https%3A%2F%2Fexample.com%2Ffoo",
-  "controller": "did:key:example",
-  "invocationTarget": "https://example.com/foo"
-}
-        </pre>
-
-        <p>
-          A root zcap MUST have an `@context` field that is a string with the
-          value `https://w3id.org/zcap/v1`. This field makes zcaps JSON-LD
-          compatible, but does not mean that any other JSON-LDisms are
-          permitted. In other words, zcaps are JSON-based, and the JSON has
-          been chosen carefully such that it can be interpreted properly as
-          JSON-LD as well. Other JSON-LD representations that deviate from the
-          JSON expression of a zcap are not permitted.
-        </p>
-
-        <p>
-          By enabling JSON-LD compatibility, DI proofs (Data Integrity Proofs,
-          formerly known as Linked Data proofs) are used instead of JOSE-based
-          signatures. This helps keep zcap sizes small by eliminating the need to
-          encapsulate zcaps via base64 encoding. This is particularly important
-          for expressing capability chains,
-          where ancestor zcaps would be base64-encoded N+1 times where N is the
-          length or position in the chain. If neither of these approaches were
-          used, a novel signature encapsulation mechanism would have to be
-          invented to get the same benefits; instead, reuse of existing work is
-          preferred.
-        </p>
-
-        <p>
-          Additionally, JSON-LD compatibility enables CBOR-LD to be used
-          to express zcaps &mdash; further reducing size via semantic compression.
-
-          When <a href="#invoking-root-capability">invoking a root zcap</a>,
-          a capability invocation proof is added, not to the root zcap itself,
-          but rather to another document that is acceptable to an API. This
-          means that no additional contexts (especially cryptosuite contexts) ever
-          need to be added to a root zcap. Further work on the Data Integrity
-          1.0 spec could alleviate the need for additional cryptosuite
-          contexts entirely.
-        </p>
-
-        <p>
-          A root zcap MUST have an `id` that is a string that expresses a URN.
-          This ID can always be dereferenced by the verifier system if it is a
-          valid root zcap for a particular endpoint. The ID of a root zcap
-          SHOULD <!-- this should become a MUST if it covers all use cases,
-          to keep things simple --> have the following format:
-        </p>
-
-        <pre>
-urn:zcap:root:${encodeURIComponent(invocationTarget)}
-        </pre>
-
-        <p>
-          This format makes it clear that the identifier is for the
-          root zcap for the root invocation target, `invocationTarget`.
-        </p>
-
-        <p>
-          A root zcap MUST have an `invocationTarget` that is a string that
-          expresses a URI. The invocation target identifies where the zcap may
-          be invoked, and identifies the target object for which the root zcap
-          expresses authority.
-        </p>
-
-        <p>
-          A root zcap MUST have a `controller` that is a string or an array of
-          strings that each express a URI that identifies a controller for the
-          root zcap. The controller (or controllers) may take any actions with
-          the invocation target (that are supported by the verifier) by
-          invoking the root zcap. The controller (or controllers) may create
-          <a href="#delegated-capability">delegated zcaps</a>
-          from the root zcap.
-        </p>
-
-        <p>
-          Note: A root zcap MUST NOT have any other fields.
-        </p>
-
-        <p>
-          A root zcap can be invoked by referencing only its ID because the
-          verifier can (and MUST) always dereference the zcap locally using a
-          trusted dereferencing mechanism. This is because a root zcap does not
-          have a capability delegation proof; it is the root of trust for a
-          capability chain.
-        </p>
-
-        <section id="invoking-root-capability">
-          <h2>Invoking a Root Zcap</h2>
-
-          <p>
-            There can be multiple ways to invoke a root zcap.
-            These include:
-          </p>
-          <ul>
-            <li>
-              by <a href="#proving-invocation-with-http-signature">using an HTTP signature</a> in an HTTP request
-            </li>
-            <li>
-              by <a href="#proving-invocation-with-data-integrity-proof">attaching an LD capability invocation proof to a document</a>
-            </li>
-          </ul>
-
-          <p>
-            The verifier will decide which of these methods is acceptable.
-          </p>
-        </section>
-
-        <section id="dereferencing-root-capability">
-          <h2>Dereferencing a Root Capability on a Verifier System</h2>
-
-          <p>
-            It is expected that only verification systems will dereference root
-            zcaps from their IDs. One model for new HTTP APIs is to store a
-            controller value with every resource at the base of a hierarchy,
-            for instance, store controller `X` for the collection
-            `https://foo.example/collections/123`. When the root zcap for this
-            collection is invoked or referenced via a delegated zcap invocation,
-            the verifier can look up the `controller` property (or receive it from
-            another system in some kind of decentralized setup) for that
-            resource and include it in a "dynamically dereferenced" root zcap.
-            In other words, the verifier sees the root zcap ID
-            `urn:zcap:root:{encodeURIComponent(https://foo.example/collections/123)}`,
-            and dynamically converts that (after looking up its controller) into:
-          </p>
-
-          <pre class="example highlight javascript">
-{
-  "@context": "https://w3id.org/zcap/v1",
-  "id": "urn:zcap:root:https%3A%2F%2Ffoo.example%2Fcollections%2F123",
-  // populated via a database or external system call
-  "controller": "did:key:example",
-  "invocationTarget": "https://foo.example/collections/123"
-}
-          </pre>
-
-        </section>
-      </section>
     </section>
+
     <section id="terminology">
       <h2>Terminology</h2>
       <!-- TODO: Add introductory paragraph to this section -->
@@ -829,10 +682,157 @@ urn:zcap:root:${encodeURIComponent(invocationTarget)}
         </p>
       </div>
 
-      <!-- TODO: Insert Alyssa's example from the introduction -->
+            <section id="root-capability">
+        <h2>Root Capability</h2>
+        <p>
+          A root zcap looks like this:
+        </p>
 
-      <section id="delegation">
-        <h2>Delegation</h2>
+        <pre class="example highlight javascript">
+{
+  "@context": "https://w3id.org/zcap/v1",
+  "id": "urn:zcap:root:https%3A%2F%2Fexample.com%2Ffoo",
+  "controller": "did:key:example",
+  "invocationTarget": "https://example.com/foo"
+}
+        </pre>
+
+        <p>
+          A root zcap MUST have an `@context` field that is a string with the
+          value `https://w3id.org/zcap/v1`. This field makes zcaps JSON-LD
+          compatible, but does not mean that any other JSON-LDisms are
+          permitted. In other words, zcaps are JSON-based, and the JSON has
+          been chosen carefully such that it can be interpreted properly as
+          JSON-LD as well. Other JSON-LD representations that deviate from the
+          JSON expression of a zcap are not permitted.
+        </p>
+
+        <p>
+          By enabling JSON-LD compatibility, DI proofs (Data Integrity Proofs,
+          formerly known as Linked Data proofs) are used instead of JOSE-based
+          signatures. This helps keep zcap sizes small by eliminating the need to
+          encapsulate zcaps via base64 encoding. This is particularly important
+          for expressing capability chains,
+          where ancestor zcaps would be base64-encoded N+1 times where N is the
+          length or position in the chain. If neither of these approaches were
+          used, a novel signature encapsulation mechanism would have to be
+          invented to get the same benefits; instead, reuse of existing work is
+          preferred.
+        </p>
+
+        <p>
+          Additionally, JSON-LD compatibility enables CBOR-LD to be used
+          to express zcaps &mdash; further reducing size via semantic compression.
+
+          When <a href="#invoking-root-capability">invoking a root zcap</a>,
+          a capability invocation proof is added, not to the root zcap itself,
+          but rather to another document that is acceptable to an API. This
+          means that no additional contexts (especially cryptosuite contexts) ever
+          need to be added to a root zcap. Further work on the Data Integrity
+          1.0 spec could alleviate the need for additional cryptosuite
+          contexts entirely.
+        </p>
+
+        <p>
+          A root zcap MUST have an `id` that is a string that expresses a URN.
+          This ID can always be dereferenced by the verifier system if it is a
+          valid root zcap for a particular endpoint. The ID of a root zcap
+          SHOULD <!-- this should become a MUST if it covers all use cases,
+          to keep things simple --> have the following format:
+        </p>
+
+        <pre>
+urn:zcap:root:${encodeURIComponent(invocationTarget)}
+        </pre>
+
+        <p>
+          This format makes it clear that the identifier is for the
+          root zcap for the root invocation target, `invocationTarget`.
+        </p>
+
+        <p>
+          A root zcap MUST have an `invocationTarget` that is a string that
+          expresses a URI. The invocation target identifies where the zcap may
+          be invoked, and identifies the target object for which the root zcap
+          expresses authority.
+        </p>
+
+        <p>
+          A root zcap MUST have a `controller` that is a string or an array of
+          strings that each express a URI that identifies a controller for the
+          root zcap. The controller (or controllers) may take any actions with
+          the invocation target (that are supported by the verifier) by
+          invoking the root zcap. The controller (or controllers) may create
+          <a href="#delegated-capability">delegated zcaps</a>
+          from the root zcap.
+        </p>
+
+        <p>
+          Note: A root zcap MUST NOT have any other fields.
+        </p>
+
+        <p>
+          A root zcap can be invoked by referencing only its ID because the
+          verifier can (and MUST) always dereference the zcap locally using a
+          trusted dereferencing mechanism. This is because a root zcap does not
+          have a capability delegation proof; it is the root of trust for a
+          capability chain.
+        </p>
+
+        <section id="invoking-root-capability">
+          <h2>Invoking a Root Zcap</h2>
+
+          <p>
+            There can be multiple ways to invoke a root zcap.
+            These include:
+          </p>
+          <ul>
+            <li>
+              by <a href="#proving-invocation-with-http-signature">using an HTTP signature</a> in an HTTP request
+            </li>
+            <li>
+              by <a href="#proving-invocation-with-data-integrity-proof">attaching an LD capability invocation proof to a document</a>
+            </li>
+          </ul>
+
+          <p>
+            The verifier will decide which of these methods is acceptable.
+          </p>
+        </section>
+
+        <section id="dereferencing-root-capability">
+          <h2>Dereferencing a Root Capability on a Verifier System</h2>
+
+          <p>
+            It is expected that only verification systems will dereference root
+            zcaps from their IDs. One model for new HTTP APIs is to store a
+            controller value with every resource at the base of a hierarchy,
+            for instance, store controller `X` for the collection
+            `https://foo.example/collections/123`. When the root zcap for this
+            collection is invoked or referenced via a delegated zcap invocation,
+            the verifier can look up the `controller` property (or receive it from
+            another system in some kind of decentralized setup) for that
+            resource and include it in a "dynamically dereferenced" root zcap.
+            In other words, the verifier sees the root zcap ID
+            `urn:zcap:root:{encodeURIComponent(https://foo.example/collections/123)}`,
+            and dynamically converts that (after looking up its controller) into:
+          </p>
+
+          <pre class="example highlight javascript">
+{
+  "@context": "https://w3id.org/zcap/v1",
+  "id": "urn:zcap:root:https%3A%2F%2Ffoo.example%2Fcollections%2F123",
+  // populated via a database or external system call
+  "controller": "did:key:example",
+  "invocationTarget": "https://foo.example/collections/123"
+}
+          </pre>
+
+        </section>
+      </section>
+
+      <section id="capability delegation">
+        <h2>Capability Delegation</h2>
         <p>
           A capability document that is not the target MUST also have a
           <code>parentCapability</code> property which either points at the
@@ -845,7 +845,7 @@ urn:zcap:root:${encodeURIComponent(invocationTarget)}
         </p>
       </section>
 
-            <section id="delegated-capability">
+      <section id="delegated-capability">
         <h2>Delegated Capability</h2>
 
         <p>
