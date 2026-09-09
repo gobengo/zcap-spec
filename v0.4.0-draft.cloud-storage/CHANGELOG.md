@@ -10,13 +10,26 @@ Non-normative (but normative adjacent)
 
 Non-normative
 
-* In `use-case/cloud-storage-delegation.md` Scenario 1, the Cloud Storage identifier document advertises where to deliver invocations
+* Remove the "This Candidate Solution is incomplete" issue from `use-case/cloud-storage-delegation.md`.
+  Everything it asked for is now shown: Bob delegates to Dummy Bot, Dummy Bot creates the invocation, and Dummy Bot delivers it to the invocation target in both scenarios.
+
+* In `use-case/cloud-storage-delegation.md` Scenario 2, show two ways an invocation reaches the invocation target:
+  first over an unspecified non-HTTP channel, which needs no published DID document and no `CapabilityInvocationService` at all,
+  then over HTTP, where publishing a `CapabilityInvocationService` is what makes delivery explicit and interoperable.
+  The invocation document is identical in both; only delivery differs.
+
+* In `use-case/cloud-storage-delegation.md` Scenario 2, show the Cloud Storage creating its DID offline and delegating offline,
+  and only publishing its identifier document to a verifiable data registry after the first delegations exist.
+  The `CapabilityInvocationService` URL is chosen at publication time, not before, and Dummy Bot discovers it by resolving the DID at invocation time.
+  This demonstrates that a DID `invocationTarget` lets the whole delegation chain be created without a network, a server, or a decision about where invocations will be received.
+
+* In `use-case/cloud-storage-delegation.md` Scenario 2, the Cloud Storage identifier document advertises where to deliver invocations
   as a service of type `CapabilityInvocationService` rather than a storage-product service type.
   This names the endpoint by what it accepts (capability invocations for this `invocationTarget`) instead of by what the service stores.
 
 * Split `use-case/cloud-storage-delegation.md` into two scenarios of the same use case.
-  Scenario 1 identifies the Cloud Storage by a DID `invocationTarget`, faithful to the original lds-ocap scenario where the Cloud Storage is `did:example:0b36c784-f9f4-4c1e-b76c-d821a4b32741` and independent of any storage location host.
-  Scenario 2 identifies the Cloud Storage by an HTTPS URL `invocationTarget`, matching the style of the examples in the rest of the spec.
+  Scenario 1 identifies the Cloud Storage by an HTTPS URL `invocationTarget`, matching the style of the examples in the rest of the spec. It is the simpler case, so it is shown first, and its introduction says plainly that it is not consistent with the original lds-ocap scenario.
+  Scenario 2 identifies the Cloud Storage by a DID `invocationTarget`, faithful to the original lds-ocap scenario where the Cloud Storage is `did:example:0b36c784-f9f4-4c1e-b76c-d821a4b32741` and independent of any storage location host.
   Each scenario uses its own zcap identifiers, and each shows the whole chain from root zcap through invocation.
 
 * Fix `use-case/cloud-storage-delegation.md` Cloud Storage identifier document so its `id` matches the identifier that resolves to it and the `controller` of its verification methods.
