@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <title>Use Case: Cloud Storage Delegation</title>
+    <script src="https://cdn.jsdelivr.net/gh/w3c/respec-mermaid@1.3.0/dist/main.js"></script>
+    <script src='//www.w3.org/Tools/respec/respec-w3c' class='remove'></script>
+    <script class='remove'>
+     var respecConfig = {
+         specStatus: "CG-DRAFT",
+         subtitle: "A use case for Authorization Capabilities (zcap)",
+         editors: [
+             {name: "Benjamin Goering",
+              url: "https://bengo.is/"},
+         ],
+         license: "w3c-software-doc",
+         processVersion: 2017,
+         edDraftURI: "https://w3c-ccg.github.io/zcap-spec/use-case/cloud-storage.html",
+         shortName: "zcap-spec-use-case-cloud-storage",
+         group: "credentials",
+         issueBase: "https://github.com/w3c-ccg/zcap-spec/issues/",
+         otherLinks: [
+             {
+                 "key": "Specification",
+                 "data": [
+                     {
+                         "value": "Authorization Capabilities",
+                         "href": "../index.html",
+                     }
+                 ]
+             },
+             {
+                 "key": "Repository",
+                 "data": [
+                     {
+                         "value": "Git repository",
+                         "href": "https://github.com/w3c-ccg/zcap-spec",
+                     },
+                     {
+                         "value": "Issues",
+                         "href": "https://github.com/w3c-ccg/zcap-spec/issues",
+                     },
+                     {
+                         "value": "Commits",
+                         "href": "https://github.com/w3c-ccg/zcap-spec/commits/gh-pages",
+                     }
+                 ]
+             }
+         ],
+
+         postProcess: [window.respecMermaid.createFigures],
+
+         // name of the WG
+         wg:           "Credentials Community Group",
+
+         // URI of the public WG page
+         wgURI:        "https://www.w3.org/community/credentials/",
+
+         // name (with the @w3c.org) of the public mailing to which comments are due
+         wgPublicList: "public-credentials",
+
+         // URI of the patent status for this WG, for Rec-track documents
+         // NOTE: Though not a Working Group, and this spec is not yet rec-track,
+         // the CCG follows the W3C Community Contributor License Agreement.
+         wgPatentURI:  "https://www.w3.org/community/about/agreements/cla/",
+     };
+    </script>
+    <style>
+      pre, code {
+        -moz-tab-size: 2; /* For older Firefox support */
+        tab-size: 2;      /* Set tab display size to 2 spaces */
+      }
+
+      /* respec-mermaid hardcodes `aspect-ratio: 2/1` as an inline style on the
+         generated <img>. Add class="mermaid-aspect-auto" to a section to let
+         its diagrams keep their natural proportions instead. */
+      .mermaid-aspect-auto pre > img {
+        aspect-ratio: auto !important;
+      }
+    </style>
+  </head>
+  <!-- Style guide for this document:
+        - Indent tags appropriately according to nesting depth
+        - Newline after every sentence (this helps making reading git diffs
+          easier, as well as merging in complicated changes, because a change
+          will only affect a sentence at a time rather than a complete
+          paragraph)
+        - Wrap text at column 79 (the least critical of the three conventions
+          since this merely helps the text look nicer in many text editors)
+     -->
+  <body>
+    <section id='abstract'>
+      <p>
+        This document presents the Cloud Storage Delegation use case for
+        <a href="../index.html">Authorization Capabilities</a>
+        (<code>zcap</code> for short),
+        and two scenarios that realize it.
+        The use case originated in
+        <a href="https://github.com/WebOfTrustInfo/rwot5-boston/blob/master/draft-documents/lds-ocap/lds-ocap.md">
+          "Linked Data Capabilities" by Webber, Miller at RWOT5</a>,
+        which inspired zcaps.
+      </p>
+      <p>
+        The same content appears as an appendix of the
+        <a href="../index.html">Authorization Capabilities</a> specification.
+        It is published here on its own so that it can be read and linked to
+        without the rest of the specification.
+      </p>
+    </section>
+    <section id='sotd'>
+      <p>
+        This document is a use case for
+        <a href="../index.html">Authorization Capabilities</a>,
+        and is informative.
+        It defines no normative requirements of its own.
+        Where this document and the specification disagree,
+        the specification takes precedence.
+      </p>
+    </section>
+
+    <section
+      id="use-case-cloud-storage-delegation"
+      class="mermaid-aspect-auto"
+      data-include="cloud-storage-delegation.md"
+      data-include-format="markdown"
+      ></section>
+  </body>
+</html>
