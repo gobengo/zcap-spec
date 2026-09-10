@@ -108,7 +108,7 @@ Because the Cloud Storage `https://example.com/storage` has been configured out-
 	"id": "urn:zcap:root:https%3A%2F%2Fexample.com%2Fstorage",
 	"invocationTarget": "https://example.com/storage",
 	"controller": "did:key:alice"
-}	
+}
 ```
 
 #### Note: Root Capability with DID `invocationTarget`
@@ -161,6 +161,8 @@ The use case says:
 
 Alice's capability to store files in the Cloud Storage is represented as a capability delegation where
 * `parentCapability` is the URN of the root zcap of the cloud storage invocation target
+* `invocationTarget` is the target this capability authorizes action against.
+  It is not attenuated here, so it matches the `invocationTarget` of the parent root capability.
 * `proof` contains a proof of `capabilityDelegation` proven by an authorized verification method from the Cloud Storage identifier document.
 * `proof.capabilityChain` is the capability ancestors array.
   Because this delegation's parent is the root zcap, the array has exactly one entry: the root zcap identified by ID (never embedded).
@@ -171,6 +173,7 @@ Alice's capability to store files in the Cloud Storage is represented as a capab
 	"id": "urn:uuid:3f1a5c02-9b34-4a7e-8f21-6d0c7b5e4a11",
 	"parentCapability": "urn:zcap:root:https%3A%2F%2Fexample.com%2Fstorage",
 	"controller": "did:key:alice",
+	"invocationTarget": "https://example.com/storage",
 	"expires": "2027-01-01T00:00:00Z",
 	"proof": [
 		{
@@ -194,6 +197,7 @@ Alice represents this delegation to Bob as a capability delegation where
 * `parentCapability` is the URN of Alice's capability that is being delegated here
 * `controller` is a URI controlled by Bob
 * `allowedAction` includes the URI of the `UploadFile` method supported by Cloud Storage
+* `invocationTarget` matches the parent capability's, because Alice does not attenuate the target here
 * `caveat` includes a caveat supported by the Cloud Storage that limits each UploadFile invocation to 52428800 bytes (50 MB)
 * `proof` includes a proof of `capabilityDelegation` proven by the verificationMethod for `did:key:alice`
 * `proof.capabilityChain` is the capability ancestors array whose first entry is the root zcap ID and whose last entry is the fully embedded parent capability (Alice's capability)
@@ -204,6 +208,7 @@ Alice represents this delegation to Bob as a capability delegation where
 	"id": "urn:uuid:6c9d4b18-2e57-4c3a-9a86-1f0e2d7c8b34",
 	"parentCapability": "urn:uuid:3f1a5c02-9b34-4a7e-8f21-6d0c7b5e4a11",
 	"controller": "did:key:bob",
+	"invocationTarget": "https://example.com/storage",
 	"expires": "2027-01-01T00:00:00Z",
 	"allowedAction": [
 		"https://example.com/storage/method/UploadFile"
@@ -229,6 +234,7 @@ Alice represents this delegation to Bob as a capability delegation where
 					"id": "urn:uuid:3f1a5c02-9b34-4a7e-8f21-6d0c7b5e4a11",
 					"parentCapability": "urn:zcap:root:https%3A%2F%2Fexample.com%2Fstorage",
 					"controller": "did:key:alice",
+					"invocationTarget": "https://example.com/storage",
 					"expires": "2027-01-01T00:00:00Z",
 					"proof": [
 						{
@@ -264,6 +270,7 @@ Bob represents his capability delegation to the Dummy Bot as a capability delega
 * `parentCapability` is the URN of Bob's capability that is being delegated here
 * `controller` is the URI of the delegee (Dummy Bot's DID)
 * `allowedAction` includes the URI of the `UploadFile` method supported by Cloud Storage and invoked by Dummy Bot
+* `invocationTarget` matches the parent capability's, because Bob does not attenuate the target here
 * `expires` is explicitly 30 days after the proof `created` date, reflecting Bob's 30-day trial period
 * `proof.capabilityChain` is the capability ancestors array. It has three entries:
   the root zcap ID, then Alice's capability referenced by ID only, then Bob's capability (the parent) fully embedded.
@@ -275,6 +282,7 @@ Bob represents his capability delegation to the Dummy Bot as a capability delega
 	"id": "urn:uuid:9a2e7f60-4d18-4b52-8c37-5e6a1b0f2d49",
 	"parentCapability": "urn:uuid:6c9d4b18-2e57-4c3a-9a86-1f0e2d7c8b34",
 	"controller": "did:key:dummy",
+	"invocationTarget": "https://example.com/storage",
 	"expires": "2026-01-31T00:00:00Z",
 	"allowedAction": [
 		"https://example.com/storage/method/UploadFile"
@@ -294,6 +302,7 @@ Bob represents his capability delegation to the Dummy Bot as a capability delega
 					"id": "urn:uuid:6c9d4b18-2e57-4c3a-9a86-1f0e2d7c8b34",
 					"parentCapability": "urn:uuid:3f1a5c02-9b34-4a7e-8f21-6d0c7b5e4a11",
 					"controller": "did:key:bob",
+					"invocationTarget": "https://example.com/storage",
 					"expires": "2027-01-01T00:00:00Z",
 					"allowedAction": [
 						"https://example.com/storage/method/UploadFile"
@@ -319,6 +328,7 @@ Bob represents his capability delegation to the Dummy Bot as a capability delega
 									"id": "urn:uuid:3f1a5c02-9b34-4a7e-8f21-6d0c7b5e4a11",
 									"parentCapability": "urn:zcap:root:https%3A%2F%2Fexample.com%2Fstorage",
 									"controller": "did:key:alice",
+									"invocationTarget": "https://example.com/storage",
 									"expires": "2027-01-01T00:00:00Z",
 									"proof": [
 										{
@@ -382,6 +392,7 @@ In this solution, Dummy Bot creates a JSON Capability Invocation where
 			"id": "urn:uuid:9a2e7f60-4d18-4b52-8c37-5e6a1b0f2d49",
 			"parentCapability": "urn:uuid:6c9d4b18-2e57-4c3a-9a86-1f0e2d7c8b34",
 			"controller": "did:key:dummy",
+			"invocationTarget": "https://example.com/storage",
 			"expires": "2026-01-31T00:00:00Z",
 			"allowedAction": [
 				"https://example.com/storage/method/UploadFile"
@@ -401,6 +412,7 @@ In this solution, Dummy Bot creates a JSON Capability Invocation where
 							"id": "urn:uuid:6c9d4b18-2e57-4c3a-9a86-1f0e2d7c8b34",
 							"parentCapability": "urn:uuid:3f1a5c02-9b34-4a7e-8f21-6d0c7b5e4a11",
 							"controller": "did:key:bob",
+							"invocationTarget": "https://example.com/storage",
 							"expires": "2027-01-01T00:00:00Z",
 							"allowedAction": [
 								"https://example.com/storage/method/UploadFile"
@@ -426,6 +438,7 @@ In this solution, Dummy Bot creates a JSON Capability Invocation where
 											"id": "urn:uuid:3f1a5c02-9b34-4a7e-8f21-6d0c7b5e4a11",
 											"parentCapability": "urn:zcap:root:https%3A%2F%2Fexample.com%2Fstorage",
 											"controller": "did:key:alice",
+											"invocationTarget": "https://example.com/storage",
 											"expires": "2027-01-01T00:00:00Z",
 											"proof": [
 												{
@@ -455,14 +468,73 @@ In this solution, Dummy Bot creates a JSON Capability Invocation where
 }
 ```
 
-#### Delivering the Invocation
+#### Delivering the JSON Capability Invocation
 
 Because the `invocationTarget` is itself an HTTPS URL, delivery needs no discovery step:
 Dummy Bot POSTs the invocation to `https://example.com/storage`, the `invocationTarget` named in its own `proof`.
 
+Serialized as `message/http`, that request is
+
+```http
+POST /storage HTTP/1.1
+Host: example.com
+Date: Tue, 01 Jan 2026 00:00:00 GMT
+Content-Type: application/json
+
+{
+	"id": "urn:uuid:c47b0d3e-8f21-4a95-b6d0-2e5c9f1a7b38",
+	"file": "nEOSQ7jbzBNg0Glup/FfeGDDzvLDvgEL36wcNpmbvKDgPy6+...",
+	"proof": { ... the capabilityInvocation proof shown above ... }
+}
+```
+
+The request body is the invocation JSON shown above, unchanged.
+The authority is carried inside that document, in `proof`, so this request needs no `Capability-Invocation` header and no HTTP message signature.
+That is the difference between this and an [Invocation HTTP Request](https://w3c-ccg.github.io/zcap-spec/#invocation-http-request), where the invocation is expressed by signing the HTTP request itself.
+
+If the chain and caveats are satisfied, the Cloud Storage responds
+
+```http
+HTTP/1.1 201 Created
+Date: Tue, 01 Jan 2026 00:00:00 GMT
+Location: https://example.com/storage/file/ee3a9c1f
+```
+
+and otherwise refuses the request, for example with `403 Forbidden` when the zcap has expired, the file exceeds the caveat, or the action is not in `allowedAction`.
+
 That directness is the advantage of this scenario.
 It is also the same property that binds the Cloud Storage to this host, discussed in the introduction above.
 [Cloud Storage Scenario 2](#cloud-storage-scenario-2-did-invocationtarget) shows what delivery looks like when the `invocationTarget` is a DID and the URL is not known in advance.
+
+#### Invoking with an HTTP Signature
+
+The JSON Capability Invocation above carries its authority in the body.
+Dummy Bot may instead invoke the same capability by signing the HTTP request itself, as described in [Invocation HTTP Signature](https://w3c-ccg.github.io/zcap-spec/#invocation-http-signature).
+The body is then just the uploaded file's representation, and the zcap travels in a `Capability-Invocation` header:
+* `capability` is the full delegated zcap Dummy Bot holds, serialized to JSON, gzipped, then base64url-encoded
+* `action` is the `UploadFile` action being invoked
+* the request URL is the intended invocation target, `https://example.com/storage`
+* the signature is made with a verification method authorized for `capabilityInvocation` by `did:key:dummy`, the `controller` of that zcap
+
+```http
+POST /storage HTTP/1.1
+Host: example.com
+Date: Tue, 01 Jan 2026 00:00:00 GMT
+Content-Type: application/json
+Capability-Invocation: zcap capability={base64url(gzip(json(zcap urn:uuid:9a2e7f60-4d18-4b52-8c37-5e6a1b0f2d49)))},action="https://example.com/storage/method/UploadFile"
+Content-Digest: sha-256=:y6p4T1s616oH+n04bZ9NzPzqB2qR+B/T3V7V9XN6b4Y=:
+Signature-Input: zcap=("@method" "@path" "capability-invocation" "content-digest" "content-type");alg="ed25519";created=1798294620;keyid="did:key:dummy#dummy"
+Signature: zcap=:m28+dfHk1Pq6VvKxFxX9Q9zNz98bX5cKldP1M0zNzM3NzUzNzdXNzr1PzM3NzUzNzUzNzr1PzM3NzUzNzUzNzM3NzA==:
+
+{"file":"nEOSQ7jbzBNg0Glup/FfeGDDzvLDvgEL36wcNpmbvKDgPy6+..."}
+```
+
+The gzipped, base64url-encoded `capability` parameter is the same delegated zcap shown in [Bob Delegates to Dummy Bot](#bob-delegates-to-dummy-bot), including its `proof.capabilityChain`, so the verifier still receives the whole chain and still resolves nothing over the network to check it.
+
+The Cloud Storage verifies the same facts either way.
+What differs is where the invocation lives:
+* as a JSON Capability Invocation, the invocation is a document that any channel can carry, and the HTTP request is only a way of moving it
+* as an HTTP Signature, the invocation is the HTTP request, so it cannot be forwarded, stored, or replayed over another protocol without losing what authorized it
 
 ## Cloud Storage Scenario 2: DID `invocationTarget`
 
@@ -605,6 +677,8 @@ The use case says:
 
 Alice's capability to store files in the Cloud Storage is represented as a capability delegation where
 * `parentCapability` is the URN of the root zcap of the cloud storage invocation target
+* `invocationTarget` is the target this capability authorizes action against.
+  It is not attenuated here, so it matches the `invocationTarget` of the parent root capability.
 * `proof` contains a proof of `capabilityDelegation` proven by an authorized verification method from the Cloud Storage identifier document
 * `proof.capabilityChain` is the capability ancestors array.
   Because this delegation's parent is the root zcap, the array has exactly one entry: the root zcap identified by ID (never embedded).
@@ -615,6 +689,7 @@ Alice's capability to store files in the Cloud Storage is represented as a capab
 	"id": "urn:uuid:0b36c784-4941-4b61-94de-cf5c539041f1",
 	"parentCapability": "urn:zcap:root:did%3Aexample%3A0b36c784-f9f4-4c1e-b76c-d821a4b32741",
 	"controller": "did:key:alice",
+	"invocationTarget": "did:example:0b36c784-f9f4-4c1e-b76c-d821a4b32741",
 	"expires": "2027-01-01T00:00:00Z",
 	"proof": [
 		{
@@ -638,6 +713,7 @@ Alice represents this delegation to Bob as a capability delegation where
 * `parentCapability` is the URN of Alice's capability that is being delegated here
 * `controller` is a URI controlled by Bob
 * `allowedAction` includes the URI of the `UploadFile` method supported by Cloud Storage
+* `invocationTarget` matches the parent capability's, because Alice does not attenuate the target here
 * `caveat` includes a caveat supported by the Cloud Storage that limits each UploadFile invocation to 52428800 bytes (50 MB)
 * `proof` includes a proof of `capabilityDelegation` proven by the verificationMethod for `did:key:alice`
 * `proof.capabilityChain` is the capability ancestors array whose first entry is the root zcap ID and whose last entry is the fully embedded parent capability (Alice's capability)
@@ -648,6 +724,7 @@ Alice represents this delegation to Bob as a capability delegation where
 	"id": "urn:uuid:f7412b9a-854b-47ab-806b-3ac736cc7cda",
 	"parentCapability": "urn:uuid:0b36c784-4941-4b61-94de-cf5c539041f1",
 	"controller": "did:key:bob",
+	"invocationTarget": "did:example:0b36c784-f9f4-4c1e-b76c-d821a4b32741",
 	"expires": "2027-01-01T00:00:00Z",
 	"allowedAction": [
 		"did:example:0b36c784-f9f4-4c1e-b76c-d821a4b32741#actions/UploadFile"
@@ -673,6 +750,7 @@ Alice represents this delegation to Bob as a capability delegation where
 					"id": "urn:uuid:0b36c784-4941-4b61-94de-cf5c539041f1",
 					"parentCapability": "urn:zcap:root:did%3Aexample%3A0b36c784-f9f4-4c1e-b76c-d821a4b32741",
 					"controller": "did:key:alice",
+					"invocationTarget": "did:example:0b36c784-f9f4-4c1e-b76c-d821a4b32741",
 					"expires": "2027-01-01T00:00:00Z",
 					"proof": [
 						{
@@ -709,6 +787,7 @@ Bob represents his capability delegation to the Dummy Bot as a capability delega
 * `parentCapability` is the URN of Bob's capability that is being delegated here
 * `controller` is the URI of the delegee (Dummy Bot's DID)
 * `allowedAction` includes the URI of the `UploadFile` method supported by Cloud Storage and invoked by Dummy Bot
+* `invocationTarget` matches the parent capability's, because Bob does not attenuate the target here
 * `expires` is explicitly 30 days after the proof `created` date, reflecting Bob's 30-day trial period
 * `proof.capabilityChain` is the capability ancestors array. It has three entries:
   the root zcap ID, then Alice's capability referenced by ID only, then Bob's capability (the parent) fully embedded.
@@ -720,6 +799,7 @@ Bob represents his capability delegation to the Dummy Bot as a capability delega
 	"id": "urn:uuid:d2c83c43-878a-4c01-984f-b2f57932ce5f",
 	"parentCapability": "urn:uuid:f7412b9a-854b-47ab-806b-3ac736cc7cda",
 	"controller": "did:key:dummy",
+	"invocationTarget": "did:example:0b36c784-f9f4-4c1e-b76c-d821a4b32741",
 	"expires": "2026-01-31T00:00:00Z",
 	"allowedAction": [
 		"did:example:0b36c784-f9f4-4c1e-b76c-d821a4b32741#actions/UploadFile"
@@ -739,6 +819,7 @@ Bob represents his capability delegation to the Dummy Bot as a capability delega
 					"id": "urn:uuid:f7412b9a-854b-47ab-806b-3ac736cc7cda",
 					"parentCapability": "urn:uuid:0b36c784-4941-4b61-94de-cf5c539041f1",
 					"controller": "did:key:bob",
+					"invocationTarget": "did:example:0b36c784-f9f4-4c1e-b76c-d821a4b32741",
 					"expires": "2027-01-01T00:00:00Z",
 					"allowedAction": [
 						"did:example:0b36c784-f9f4-4c1e-b76c-d821a4b32741#actions/UploadFile"
@@ -764,6 +845,7 @@ Bob represents his capability delegation to the Dummy Bot as a capability delega
 									"id": "urn:uuid:0b36c784-4941-4b61-94de-cf5c539041f1",
 									"parentCapability": "urn:zcap:root:did%3Aexample%3A0b36c784-f9f4-4c1e-b76c-d821a4b32741",
 									"controller": "did:key:alice",
+									"invocationTarget": "did:example:0b36c784-f9f4-4c1e-b76c-d821a4b32741",
 									"expires": "2027-01-01T00:00:00Z",
 									"proof": [
 										{
@@ -827,6 +909,7 @@ In this solution, Dummy Bot creates a JSON Capability Invocation where
 			"id": "urn:uuid:d2c83c43-878a-4c01-984f-b2f57932ce5f",
 			"parentCapability": "urn:uuid:f7412b9a-854b-47ab-806b-3ac736cc7cda",
 			"controller": "did:key:dummy",
+			"invocationTarget": "did:example:0b36c784-f9f4-4c1e-b76c-d821a4b32741",
 			"expires": "2026-01-31T00:00:00Z",
 			"allowedAction": [
 				"did:example:0b36c784-f9f4-4c1e-b76c-d821a4b32741#actions/UploadFile"
@@ -846,6 +929,7 @@ In this solution, Dummy Bot creates a JSON Capability Invocation where
 							"id": "urn:uuid:f7412b9a-854b-47ab-806b-3ac736cc7cda",
 							"parentCapability": "urn:uuid:0b36c784-4941-4b61-94de-cf5c539041f1",
 							"controller": "did:key:bob",
+							"invocationTarget": "did:example:0b36c784-f9f4-4c1e-b76c-d821a4b32741",
 							"expires": "2027-01-01T00:00:00Z",
 							"allowedAction": [
 								"did:example:0b36c784-f9f4-4c1e-b76c-d821a4b32741#actions/UploadFile"
@@ -871,6 +955,7 @@ In this solution, Dummy Bot creates a JSON Capability Invocation where
 											"id": "urn:uuid:0b36c784-4941-4b61-94de-cf5c539041f1",
 											"parentCapability": "urn:zcap:root:did%3Aexample%3A0b36c784-f9f4-4c1e-b76c-d821a4b32741",
 											"controller": "did:key:alice",
+											"invocationTarget": "did:example:0b36c784-f9f4-4c1e-b76c-d821a4b32741",
 											"expires": "2027-01-01T00:00:00Z",
 											"proof": [
 												{
@@ -995,6 +1080,38 @@ The `CapabilityInvocationService` type says what the endpoint is for: receiving 
 A type like `Storage` would describe the storage product rather than the invocation endpoint, and would leave an invoker guessing which of several services accepts invocations.
 
 Dummy Bot now delivers the invocation by resolving `did:example:0b36c784-f9f4-4c1e-b76c-d821a4b32741` and POSTing it to the `serviceEndpoint` of that service, `https://storage.example.org/invocations`.
+Serialized as `message/http`, that request is
+
+```http
+POST /invocations HTTP/1.1
+Host: storage.example.org
+Date: Tue, 01 Jan 2026 00:00:00 GMT
+Content-Type: application/json
+
+{
+	"id": "urn:uuid:b1ce3837-1f76-4e34-a6ff-eab8278315c5",
+	"file": "nEOSQ7jbzBNg0Glup/FfeGDDzvLDvgEL36wcNpmbvKDgPy6+...",
+	"proof": { ... the capabilityInvocation proof shown above ... }
+}
+```
+
+Note that the request line and `Host` header name the server, while `proof.invocationTarget` inside the body names the Cloud Storage DID.
+The request is addressed to whichever host currently serves the Cloud Storage; the invocation is bound to the Cloud Storage itself.
+As in [Cloud Storage Scenario 1](#cloud-storage-scenario-1-http-url-invocationtarget), the authority travels in the document, so no `Capability-Invocation` header or HTTP message signature is involved.
+
+The [HTTP Signature form](#invoking-with-an-http-signature) shown in Scenario 1 does not translate directly here.
+There, the request URL is the invocation target, which is how the verifier learns what was invoked.
+Here the invocation target is a DID and the request URL is only wherever that DID is currently served, so the two are no longer the same string, and the request URL alone cannot say what Dummy Bot meant to invoke.
+Invoking a DID `invocationTarget` over HTTP therefore uses the JSON form, where `proof.invocationTarget` states the target explicitly, unless some further convention is defined for carrying the target alongside an HTTP signature.
+
+If the chain and caveats are satisfied, the server responds
+
+```http
+HTTP/1.1 201 Created
+Date: Tue, 01 Jan 2026 00:00:00 GMT
+Location: https://storage.example.org/file/ee3a9c1f
+```
+
 The invocation document itself is byte-for-byte the one Dummy Bot created offline.
 The `invocationTarget` in the proof remains the DID, not the service endpoint URL, so the invocation stays bound to the Cloud Storage itself rather than to whichever host currently serves it.
 
@@ -1012,6 +1129,10 @@ In [Cloud Storage Scenario 1](#cloud-storage-scenario-1-http-url-invocationtarge
 Open questions for this scenario:
 * Should zcap-spec say anything about invocation delivery over non-HTTP channels, or is leaving it unspecified the right scope?
 * Can invocation HTTP requests for `invocationTarget` URI A be delivered to a service endpoint URL B, as done here?
+* The `urn:zcap:root:${encodeURIComponent(invocationTarget)}` format is a SHOULD, and delegated zcaps may attenuate `invocationTarget` to a sub-path of their parent's.
+  So a verifier cannot in general recover the invoked target from `proof.capabilityChain[0]` alone; it reads the invoked zcap's own `invocationTarget`.
+* Invocation HTTP Signature takes the invocation target from the request URL.
+  Should there be a way to invoke a non-URL `invocationTarget`, such as a DID, using an HTTP signature, or is the JSON form the only option there?
 * `CapabilityInvocationService` is not currently a registered service type. Should zcap-spec define and register it, so invokers can discover where to deliver invocations for a DID `invocationTarget` interoperably?
 * Note the name collision risk between the `CapabilityInvocationService` service type and the `capabilityInvocation` verification relationship. They are unrelated: one says where to send invocations, the other says which keys may make them.
 * Can `invocationTarget` be a DID like this?
