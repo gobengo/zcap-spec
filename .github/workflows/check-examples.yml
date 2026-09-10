@@ -3,9 +3,8 @@
 # example rather than how it was reflowed.
 #
 # See <https://github.com/w3c-ccg/zcap-spec/issues/105> for the rules and
-# .github/scripts/examples/ for the checker itself. The checker reports
-# violations but never rewrites index.html, so a red run here is fixed by
-# applying the diff it prints.
+# lib/zcap-spec-example-format/README.md for the checker itself. This workflow
+# never runs the checker's --fix: CI reports, a human applies.
 name: Check example formatting
 
 on:
@@ -28,10 +27,11 @@ jobs:
         with:
           node-version: 22
 
-      # The checker and its tests are dependency-free, so there is nothing to
-      # install between checkout and running them.
+      # The checker has no dependencies, so there is nothing to install
+      # between checkout and running it.
       - name: Test the checker
-        run: node --test .github/scripts/examples/*.test.mjs
+        working-directory: lib/zcap-spec-example-format
+        run: npm test
 
       - name: Check the examples in index.html
-        run: node .github/scripts/examples/check-example-formatting.mjs index.html
+        run: node lib/zcap-spec-example-format/bin/zcap-spec-example-format.mjs index.html

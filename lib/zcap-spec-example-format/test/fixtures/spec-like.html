@@ -1,0 +1,41 @@
+<!-- A miniature of the spec document: one example in the old hand-aligned
+     style, one already canonical, and three blocks the formatter must not
+     touch. Kept deliberately small so a failure points at one rule. -->
+<section>
+  <pre class="example highlight javascript">
+    {"@context": ["https://w3id.org/zcap/v1",
+                  "https://w3id.org/security/data-integrity/v2"],
+     "id": "urn:uuid:1",
+
+     // A caveat, to check that comments survive a reflow
+     "caveat": [
+       {"type": "ValidWhileTrue",
+        "uri": "https://social.example/still-valid"}]}
+  </pre>
+
+  <pre class="example json" title="Already canonical">
+{
+  "@context": "https://w3id.org/zcap/v1",
+  "id": "urn:zcap:root:https%3A%2F%2Fexample.com%2Ffoo",
+  "controller": "did:key:example",
+  "invocationTarget": "https://example.com/foo"
+}
+  </pre>
+
+  <pre>
+urn:zcap:root:${encodeURIComponent(invocationTarget)}
+  </pre>
+
+  <pre class="example http" title="Invocation HTTP Request">
+POST /api/v1/example HTTP/1.1
+Content-Type: application/json
+
+1B
+{"type":"ExampleApiAction"}
+0
+  </pre>
+
+  <pre class="example json" data-example-format="ignore">
+{"deliberately":    "hand-aligned"}
+  </pre>
+</section>
