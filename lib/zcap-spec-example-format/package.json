@@ -1,32 +1,15 @@
 {
   "name": "zcap-spec-example-format",
   "version": "0.1.0",
-  "description": "Check and fix the formatting of the JSON examples embedded in the ZCAP spec",
-  "keywords": ["zcap", "jsonc", "formatter", "respec", "linter"],
-  "homepage": "https://github.com/w3c-ccg/zcap-spec/tree/main/lib/zcap-spec-example-format#readme",
-  "bugs": "https://github.com/w3c-ccg/zcap-spec/issues",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/w3c-ccg/zcap-spec.git",
-    "directory": "lib/zcap-spec-example-format"
-  },
+  "description": "Check the formatting of the JSON examples embedded in the ZCAP spec",
   "license": "Apache-2.0",
   "type": "module",
-  "exports": {
-    ".": "./index.mjs",
-    "./package.json": "./package.json"
-  },
-  "main": "./index.mjs",
   "bin": {
-    "zcap-spec-example-format": "./bin/zcap-spec-example-format.mjs"
-  },
-  "files": ["index.mjs", "lib/", "bin/", "README.md"],
-  "engines": {
-    "node": ">=20"
+    "zcap-spec-example-format": "./check-examples.mjs"
   },
   "scripts": {
-    "test": "node --test test/*.test.mjs",
-    "check": "node bin/zcap-spec-example-format.mjs ../../index.html",
-    "fix": "node bin/zcap-spec-example-format.mjs --fix ../../index.html"
+    "test": "node --test test.mjs",
+    "check": "node check-examples.mjs ../../index.html",
+    "fix": "node check-examples.mjs --fix ../../index.html"
   }
 }

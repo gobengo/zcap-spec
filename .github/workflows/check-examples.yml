@@ -31,7 +31,7 @@ jobs:
       # between checkout and running it.
       - name: Test the checker
         working-directory: lib/zcap-spec-example-format
-        run: npm test
+        run: node --test test.mjs
 
       - name: Check the examples in index.html
-        run: node lib/zcap-spec-example-format/bin/zcap-spec-example-format.mjs index.html
+        run: node lib/zcap-spec-example-format/check-examples.mjs index.html
