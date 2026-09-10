@@ -10,6 +10,15 @@ Non-normative (but normative adjacent)
 
 Non-normative
 
+* Add the Cloud Storage Delegation use case, from the original
+  ["Linked Data Capabilities" by Webber, Miller at RWOT5](https://github.com/WebOfTrustInfo/rwot5-boston/blob/master/draft-documents/lds-ocap/lds-ocap.md)
+  that inspired zcaps, as `use-case/cloud-storage-delegation.md`, included as an appendix of the specification
+  and published on its own at `use-case/cloud-storage.html`.
+  It works the use case through two complete scenarios, each showing every capability from the root zcap through the invocation:
+  one where the `invocationTarget` is an HTTPS URL, and one where it is a DID, as in the original.
+  The DID scenario shows that the whole delegation chain and the invocation can be created offline,
+  with the invocation delivered either over an unspecified channel or over HTTP via a published `CapabilityInvocationService`.
+
 * Fix examples of delegations `@context` to start with the required value `https://w3id.org/zcap/v1`.
   Previously, some values started with URLs to other contexts like `example.org`.
 

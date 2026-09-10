@@ -3,7 +3,9 @@
   <head>
     <meta charset='utf-8'>
     <title>Authorization Capabilities v0.4.0-draft</title>
-    <script src='//www.w3.org/Tools/respec/respec-w3c' class='remove'></script>    <script class='remove'>
+    <script src="https://cdn.jsdelivr.net/gh/w3c/respec-mermaid@1.3.0/dist/main.js"></script>
+    <script src='//www.w3.org/Tools/respec/respec-w3c' class='remove'></script>
+    <script class='remove'>
      var respecConfig = {
          specStatus: "CG-DRAFT",
          subtitle: "An object capability framework for linked data systems",
@@ -61,6 +63,8 @@
              }
          ],
 
+         postProcess: [window.respecMermaid.createFigures],
+
          // name of the WG
          wg:           "Credentials Community Group",
 
@@ -80,6 +84,19 @@
          wgPatentURI:  "https://www.w3.org/community/about/agreements/cla/",
      };
     </script>
+    <style>
+      pre, code {
+        -moz-tab-size: 2; /* For older Firefox support */
+        tab-size: 2;      /* Set tab display size to 2 spaces */
+      }
+
+      /* respec-mermaid hardcodes `aspect-ratio: 2/1` as an inline style on the
+         generated <img>. Add class="mermaid-aspect-auto" to a section to let
+         its diagrams keep their natural proportions instead. */
+      .mermaid-aspect-auto pre > img {
+        aspect-ratio: auto !important;
+      }
+    </style>
   </head>
   <!-- Style guide for this document:
         - Indent tags appropriately according to nesting depth
@@ -1538,6 +1555,17 @@ Signature: zcap=:m28+dfHk1Pq6VvKxFxX9Q9zNz98bX5cKldP1M0zNzM3NzUzNzdXNzr1PzM3NzUz
       </p>
     </section>
 
+    <section class="appendix informative" id="Use Cases">
+      <h2>Use Cases</h2>
+
+      <section
+        id="use-case-cloud-storage-delegation"
+        class="mermaid-aspect-auto"
+        data-include="use-case/cloud-storage-delegation.md"
+        data-include-format="markdown"
+        ></section>
+    </section>
+
     <section class="appendix informative" id="milestones">
         <h2>Milestones</h2>
         <p>
@@ -1610,6 +1638,17 @@ Signature: zcap=:m28+dfHk1Pq6VvKxFxX9Q9zNz98bX5cKldP1M0zNzM3NzUzNzdXNzr1PzM3NzUz
               </li>
 
               <li>
+                Added a
+                <a href="#Use Cases">Use Cases</a>
+                appendix with the first use case,
+                <a href="#use-case-cloud-storage-delegation">Cloud Storage Delegation</a>,
+                also published on its own at
+                <a href="use-case/cloud-storage.html">use-case/cloud-storage.html</a>.
+                Previously no example showed a complete scenario from root capability through invocation.
+                See the <a href="#backlog">backlog</a> issue "Add Use Cases" for motivation and open questions.
+              </li>
+
+              <li>
                 Moved
                 <a href="#root-capability">Root Capability</a>,
                 <a href="#delegated-capability">Delegated Capability</a>,
@@ -1641,6 +1680,87 @@ Signature: zcap=:m28+dfHk1Pq6VvKxFxX9Q9zNz98bX5cKldP1M0zNzM3NzUzNzdXNzr1PzM3NzUz
             They may also be removed from the backlog.
             Generally, they are listed in priority order.
         </p>
+
+            <div
+              class="issue"
+              title="Add Use Cases"
+              >
+              <p>
+                Add worked use cases to the spec, each showing a complete scenario from root capability through invocation.
+                The first is
+                <a href="#use-case-cloud-storage-delegation">Cloud Storage Delegation</a>,
+                from
+                <a href="https://github.com/WebOfTrustInfo/rwot5-boston/blob/master/draft-documents/lds-ocap/lds-ocap.md">
+                  "Linked Data Capabilities" by Webber, Miller at RWOT5</a>,
+                which is the scenario zcaps were originally designed for.
+                More use cases may follow.
+              </p>
+              <p>
+                The spec's examples show individual capability documents, but no example shows a whole scenario.
+                A reader can see what a delegated zcap looks like without being able to answer:
+              </p>
+              <ul>
+                <li>
+                  What does a complete chain look like from root capability through invocation,
+                  with each `proof.capabilityChain` filled in correctly at every hop?
+                </li>
+                <li>
+                  What can an `invocationTarget` actually be, and what does the choice cost the parties involved?
+                </li>
+                <li>
+                  How does an invocation reach its target?
+                  The spec is deliberately silent, but the silence reads as an omission rather than a scope boundary.
+                </li>
+              </ul>
+              <p>
+                Worked use cases answer these by construction, and improve the spec in ways isolated examples cannot:
+              </p>
+              <ul>
+                <li>
+                  They demonstrate `proof.capabilityChain` at depth.
+                  The requirement that a delegation proof carry its ancestors array is hard to satisfy from the normative text alone.
+                  A use case can show a chain three deep, which is where the array's shape stops being obvious.
+                </li>
+                <li>
+                  They make the `invocationTarget` choice legible.
+                  Presenting an HTTPS URL target and a DID target side by side turns an unstated assumption into a documented trade-off,
+                  and shows a property the spec never demonstrates:
+                  when no capability in the chain names a URL, the entire delegation graph can exist before anyone decides where the service will live.
+                </li>
+                <li>
+                  They separate authorization from transport explicitly.
+                  Showing one invocation document delivered over different channels makes clear that a capability invocation is a document, not a request,
+                  and shows what the spec's silence about delivery costs:
+                  two conforming implementations may still be unable to talk to each other.
+                </li>
+              </ul>
+              <p>
+                Open questions raised by the Cloud Storage Delegation use case, which the use case documents rather than decides:
+              </p>
+              <ul>
+                <li>
+                  `CapabilityInvocationService` is used as the service type for discovering where to deliver invocations for a DID `invocationTarget`.
+                  That type is not registered anywhere.
+                  If discovery is meant to be interoperable, this spec probably needs to define and register it.
+                </li>
+                <li>
+                  Can an `invocationTarget` be a DID? A DID URL?
+                </li>
+                <li>
+                  May invocations for `invocationTarget` URI A be delivered to a service endpoint URL B?
+                </li>
+                <li>
+                  Must an `invocationTarget` be resolvable at delegation time, or only at invocation time?
+                </li>
+                <li>
+                  Can a verifier verify a delegation created before the target's identifier document was published,
+                  if it obtains that document out-of-band?
+                </li>
+                <li>
+                  Should this spec say anything about invocation delivery over non-HTTP channels, or is leaving it unspecified the right scope?
+                </li>
+              </ul>
+            </div>
 
             <div
               class="issue"
