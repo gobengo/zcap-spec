@@ -1,0 +1,37 @@
+# Check that the JSON examples embedded in the spec all use the same
+# formatting, so that a diff to an example shows what changed about the
+# example rather than how it was reflowed.
+#
+# See <https://github.com/w3c-ccg/zcap-spec/issues/105> for the rules and
+# .github/scripts/examples/ for the checker itself. The checker reports
+# violations but never rewrites index.html, so a red run here is fixed by
+# applying the diff it prints.
+name: Check example formatting
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # The checker and its tests are dependency-free, so there is nothing to
+      # install between checkout and running them.
+      - name: Test the checker
+        run: node --test .github/scripts/examples/*.test.mjs
+
+      - name: Check the examples in index.html
+        run: node .github/scripts/examples/check-example-formatting.mjs index.html
