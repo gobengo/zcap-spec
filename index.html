@@ -3,6 +3,7 @@
   <head>
     <meta charset='utf-8'>
     <title>Authorization Capabilities v0.4.0-rc.6</title>
+    <script src="https://cdn.jsdelivr.net/gh/w3c/respec-mermaid@1.3.0/dist/main.js"></script>
     <script src='//www.w3.org/Tools/respec/respec-w3c' class='remove'></script>    <script class='remove'>
      var respecConfig = {
          specStatus: "CG-DRAFT",
@@ -85,8 +86,18 @@
          // NOTE: Though not a Working Group, and this spec is not yet rec-track,
          // the CCG follows the W3C Community Contributor License Agreement.
          wgPatentURI:  "https://www.w3.org/community/about/agreements/cla/",
+
+         postProcess: [window.respecMermaid.createFigures],
      };
     </script>
+    <style>
+      /* respec-mermaid hardcodes `aspect-ratio: 2/1` as an inline style on the
+         generated <img>. Add class="mermaid-aspect-auto" to a section to let
+         its diagrams keep their natural proportions instead. */
+      .mermaid-aspect-auto pre > img {
+        aspect-ratio: auto !important;
+      }
+    </style>
   </head>
   <!-- Style guide for this document:
         - Indent tags appropriately according to nesting depth
@@ -97,7 +108,7 @@
         - Wrap text at column 79 (the least critical of the three conventions
           since this merely helps the text look nicer in many text editors)
      -->
-  <body>
+  <body class="mermaid-aspect-auto">
     <section id='abstract'>
       <p>
         Authorization Capabilities (<code>zcap</code> for
@@ -738,11 +749,6 @@
         </p>
 
         <dl>
-          <dt>Integrity</dt>
-          <dd>
-            Verification fails if any part of the document was modified after
-            the proof was added.
-          </dd>
 
           <dt>Purpose binding</dt>
           <dd>
@@ -1409,6 +1415,271 @@ urn:uuid:{uuid}
           the entity adding a caveat and the target evaluating (or any other
           parties observing) the invocation.
         </p>
+      </section>
+
+      <section id="delegate" class="mermaid-aspect-auto">
+        <h2>Delegate</h2>
+
+        <p>
+          The delegate algorithm produces a delegated zcap carrying a
+          [=capability delegation proof=], from a delegated zcap that does not
+          yet carry one and the capability being delegated.
+          It applies the requirements stated in
+          <a href="#delegated-capability">Delegated Capability</a> and in
+          <a href="#creating-a-capability-delegation-proof">Creating a
+          Capability Delegation Proof</a>, in an order in which they can be
+          applied.
+        </p>
+
+        <p>
+          Each step either completes or <dfn data-lt="fail|fails">fails</dfn>
+          with one of the named errors below.
+          When a step fails, no further step is performed.
+        </p>
+
+        <pre>
+delegate(unsecuredDelegatedZcap, parentCapability, parentAncestry,
+         proofMechanism, options) &rarr; delegated zcap
+        </pre>
+
+        <p>
+          The <dfn>capability ancestry</dfn> of a capability is the root zcap of
+          its chain followed by each delegated zcap from the root down to, and
+          including, its parent, in delegation order.
+          The [=capability ancestry=] of a zcap delegated directly from a root
+          zcap is that root zcap alone.
+        </p>
+
+        <p>
+          The inputs are:
+        </p>
+
+        <dl>
+          <dt>`unsecuredDelegatedZcap`</dt>
+          <dd>
+            A delegated zcap without a [=capability delegation proof=].
+          </dd>
+
+          <dt>`parentCapability`</dt>
+          <dd>
+            The capability being delegated: a
+            <a href="#root-capability">root zcap</a> or a
+            <a href="#delegated-capability">delegated zcap</a> expressed in
+            full, or the `id` of a root zcap.
+          </dd>
+
+          <dt>`parentAncestry`</dt>
+          <dd>
+            The [=capability ancestry=] of `parentCapability`, or an empty
+            sequence if `parentCapability` is a root zcap.
+          </dd>
+
+          <dt>`proofMechanism`</dt>
+          <dd>A [=proof mechanism=].</dd>
+
+          <dt>`options`</dt>
+          <dd>
+            A set of options including the `verificationMethod` the delegator
+            will use and a `maxChainLength` whose default value is 10.
+          </dd>
+        </dl>
+
+        <p>
+          The output is a delegated zcap carrying a
+          [=capability delegation proof=], or an error.
+        </p>
+
+        <ol>
+          <li>
+            If `parentCapability` is a string, then it is the `id` of a root
+            zcap:
+            <ol>
+              <li>
+                If it does not have the form
+                `urn:zcap:root:{encodeURIComponent(invocationTarget)}` given in
+                <a href="#root-capability">Root Capability</a>, [=fail=] with
+                `INVALID_ROOT_CAPABILITY`.
+              </li>
+              <li>
+                Set `parentCapability` to a root zcap whose `id` is that string
+                and whose `invocationTarget` is the result of percent-decoding
+                the remainder of that string after `urn:zcap:root:`.
+              </li>
+            </ol>
+          </li>
+          <li>
+            Let `ancestry` be `parentAncestry` with `parentCapability`
+            appended.
+          </li>
+          <li>
+            Set `unsecuredDelegatedZcap.parentCapability` to
+            `parentCapability.id`.
+          </li>
+          <li>
+            If `unsecuredDelegatedZcap` broadens the authority of
+            `parentCapability`, [=fail=]:
+            <ol>
+              <li>
+                If its `invocationTarget` is neither equal to that of
+                `parentCapability` nor an attenuation of it as described in
+                <a href="#delegated-capability-attenuation">URL Path- or
+                Query-based Attenuation</a>, [=fail=] with
+                `INVALID_INVOCATION_TARGET`.
+              </li>
+              <li>
+                If `parentCapability` has an `allowedAction` and
+                `unsecuredDelegatedZcap` expresses an action that it does not,
+                [=fail=] with `INVALID_ALLOWED_ACTION`.
+              </li>
+              <li>
+                If `parentCapability` has an `expires` and that of
+                `unsecuredDelegatedZcap` is later than it, or is absent,
+                [=fail=] with `INVALID_EXPIRES`.
+              </li>
+            </ol>
+          </li>
+          <li>
+            If the number of delegated zcaps in `ancestry`, plus one, is greater
+            than `options.maxChainLength`, [=fail=] with
+            `CHAIN_LENGTH_EXCEEDED`.
+          </li>
+          <li>
+            If `parentCapability` was given as a capability expressed in full,
+            and `options.verificationMethod` is not authorized for the
+            `capabilityDelegation` proof purpose by a `controller` of it,
+            [=fail=] with `INVALID_DELEGATOR`.
+          </li>
+          <li>
+            Return the result of adding a proof with `proofMechanism`, given
+            `unsecuredDelegatedZcap`, a proof purpose of
+            `capabilityDelegation`, `ancestry`, and `options`.
+          </li>
+        </ol>
+
+        <p>
+          The course the steps take, and the error each failing check raises:
+        </p>
+
+        <pre class="mermaid nohighlight">
+flowchart TD
+  IN["unsecuredDelegatedZcap,&lt;br/&gt;parentCapability,&lt;br/&gt;parentAncestry"]
+  Q1{"parentCapability&lt;br/&gt;is a string?"}
+  Q1B{"has the root zcap&lt;br/&gt;id form?"}
+  E1["INVALID_ROOT&lt;br/&gt;_CAPABILITY"]
+  MK["construct the root zcap&lt;br/&gt;from its id"]
+  A["ancestry = parentAncestry&lt;br/&gt;+ parentCapability"]
+  SP["set parentCapability&lt;br/&gt;on the zcap"]
+  Q4{"narrows the parent's&lt;br/&gt;target, actions&lt;br/&gt;and expiry?"}
+  E4["INVALID_INVOCATION&lt;br/&gt;_TARGET&lt;br/&gt;INVALID_ALLOWED&lt;br/&gt;_ACTION&lt;br/&gt;INVALID_EXPIRES"]
+  Q5{"delegations within&lt;br/&gt;maxChainLength?"}
+  E5["CHAIN_LENGTH&lt;br/&gt;_EXCEEDED"]
+  Q6{"parent given&lt;br/&gt;in full?"}
+  Q6B{"delegator authorized&lt;br/&gt;by a parent controller?"}
+  E6["INVALID_DELEGATOR"]
+  AP["add proof&lt;br/&gt;capabilityDelegation"]
+  OUT["delegated zcap with a&lt;br/&gt;capability delegation proof"]
+  IN --> Q1
+  Q1 -->|"an id"| Q1B
+  Q1B -->|"malformed"| E1
+  Q1B -->|"well formed"| MK
+  MK --> A
+  Q1 -->|"a capability in full"| A
+  A --> SP
+  SP --> Q4
+  Q4 -->|"no"| E4
+  Q4 -->|"yes"| Q5
+  Q5 -->|"no"| E5
+  Q5 -->|"yes"| Q6
+  Q6 -->|"yes"| Q6B
+  Q6B -->|"no"| E6
+  Q6B -->|"yes"| AP
+  Q6 -->|"no"| AP
+  AP --> OUT
+        </pre>
+
+        <p>
+          The algorithm and the things it relates:
+        </p>
+
+        <pre class="mermaid nohighlight">
+classDiagram
+  direction LR
+  class Delegate["delegate"] {
+    &lt;&lt;algorithm&gt;&gt;
+    delegate(
+      unsecuredDelegatedZcap: DelegatedZcap,
+      parentCapability: RootZcap|DelegatedZcap|string,
+      parentAncestry: CapabilityAncestry,
+      proofMechanism: ProofMechanism,
+      options: DelegateOptions
+    ) DelegatedZcap
+  }
+  class CapabilityAncestry {
+    &lt;&lt;list&gt;&gt;
+  }
+  class RootZcap {
+    id
+    controller
+    invocationTarget
+  }
+  class DelegatedZcap {
+    id
+    parentCapability
+    controller
+    invocationTarget
+    expires
+    allowedAction
+    caveat
+    proof
+  }
+  class ProofMechanism {
+    &lt;&lt;specification&gt;&gt;
+    mediaTypes
+    proofPurposes
+    addProof()
+    verifyProof()
+  }
+  class DelegateOptions {
+    verificationMethod
+    maxChainLength
+  }
+  class CapabilityDelegationProof {
+    proofPurpose = capabilityDelegation
+    verificationMethod
+  }
+  CapabilityAncestry o-- "1" RootZcap : begins with
+  CapabilityAncestry o-- "0..*" DelegatedZcap : then
+  Delegate ..&gt; CapabilityAncestry : reads
+  Delegate ..&gt; DelegateOptions : reads
+  Delegate ..&gt; ProofMechanism : adds a proof with
+  Delegate ..&gt; DelegatedZcap : returns
+  DelegatedZcap o-- "1..*" CapabilityDelegationProof : proof
+  ProofMechanism ..&gt; CapabilityDelegationProof : produces
+        </pre>
+
+        <div class="note">
+          <p>
+            Step 4 compares the delegated zcap against its parent alone, not
+            against the whole [=capability ancestry=].
+            That is sound for a delegator, because every ancestor was itself
+            checked against its own parent when it was delegated, so narrowing
+            at each hop narrows the chain.
+            A verifier cannot rely on that, and must apply the requirements
+            across the whole chain; the algorithm that does so is not specified
+            here, and is the subject of
+            <a href="#specify-algorithms-for-delegation-proof">Specify
+            algorithms for delegation proof</a>.
+          </p>
+          <p>
+            Step 6 duplicates a check a verifier performs, and step 4 duplicates
+            checks a verifier performs. Both are deliberate: an error is cheaper
+            to find when the delegation is created than when it is presented.
+            No check is performed when `parentCapability` is given as an `id`,
+            because a root zcap's `controller` is only available by
+            dereferencing it on the verifier's system, and a delegator that
+            supplied the value would be checking itself.
+          </p>
+        </div>
       </section>
 
       <section id="capabilities-vs-ACLs">
@@ -2097,6 +2368,10 @@ Signature: zcap=:m28+dfHk1Pq6VvKxFxX9Q9zNz98bX5cKldP1M0zNzM3NzUzNzdXNzr1PzM3NzUz
                   requirements elsewhere in
                   <a href="#delegated-capability">Delegated Capability</a>
                   unforgeable.
+                  <a href="#delegate">Delegate</a> then applies those
+                  requirements in an order in which they can be applied, which
+                  is what shows that the clarified `proof` property is
+                  sufficient to create a delegated zcap from.
                 </li>
               </ul>
             </li>

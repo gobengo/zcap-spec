@@ -99,6 +99,40 @@ This release contains normative changes.
   requirements upon a verifier. This gives them a counterpart a delegator can
   follow, without specifying an algorithm.
 
+* Added [Delegate](index.html#delegate), the first algorithm this document
+  specifies. It applies the requirements already stated in
+  [Delegated Capability](index.html#delegated-capability) and
+  [Creating a Capability Delegation Proof](index.html#creating-a-capability-delegation-proof)
+  in an order in which they can be applied, and secures the result by adding a
+  proof with a [proof mechanism](index.html#dfn-proof-mechanism) rather than by
+  naming a proof format.
+
+  `capability ancestry` is defined, and `fail` states once how an algorithm
+  fails, so each step names an error rather than spelling out what to return.
+  `Delegate` can fail with `CHAIN_LENGTH_EXCEEDED`, `INVALID_ALLOWED_ACTION`,
+  `INVALID_DELEGATOR`, `INVALID_EXPIRES`, `INVALID_INVOCATION_TARGET` or
+  `INVALID_ROOT_CAPABILITY`. Each is specified by the step that raises it.
+
+  `Delegate` accepts a root zcap's `id` in place of a root zcap expressed in
+  full. A root zcap is never expressed in a delegated zcap or in its proof —
+  only its `id` is — so requiring a delegator to supply one was asking for a
+  document that exists nowhere in the protocol. The `INVALID_DELEGATOR` check
+  is not performed in that case, because a root zcap's `controller` is only
+  available by dereferencing it on the verifier's system, and a delegator that
+  supplied the value would be checking itself.
+
+  Step 4 compares the delegated zcap against its parent alone. That is sound
+  for a delegator, because each ancestor was itself checked against its own
+  parent when it was delegated. A verifier cannot rely on that and must apply
+  the requirements across the whole chain, which is the subject of
+  [Specify algorithms for delegation proof](index.html#specify-algorithms-for-delegation-proof).
+
+  Two diagrams accompany it, rendered from mermaid sources by the
+  [respec-mermaid](https://github.com/w3c/respec-mermaid) plugin: a flow chart
+  of the course the steps take and the error each failing check raises, and a
+  class diagram of the algorithm's signature and the things it relates. This is
+  the document's first use of that plugin.
+
 * Added a normative reference to
   [Verifiable Credential Data Integrity 1.1](https://www.w3.org/TR/vc-data-integrity-1.1/),
   cited where a `DataIntegrityProof` is mentioned. This is the document's first
