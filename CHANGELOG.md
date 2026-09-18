@@ -41,6 +41,50 @@ This release contains normative changes.
   satisfy the requirement as written while leaving those terms undefined. Every
   example already includes this context.
 
+* Added [Proofs](index.html#proofs) and, within it,
+  [Proof Mechanism](index.html#proof-mechanism).
+
+  [capability proof](index.html#dfn-capability-proof) names what a
+  [capability delegation proof](index.html#dfn-capability-delegation-proof) and
+  a [capability invocation proof](index.html#dfn-capability-invocation-proof)
+  have in common, and
+  [proof mechanism](index.html#dfn-proof-mechanism) names the thing that
+  produces and verifies one: a specification that defines how a document is
+  secured for a proof purpose. A mechanism specification must define an add and
+  a verify operation, must state the media types it secures and the proof
+  purposes it defines proofs for, and must guarantee integrity, purpose
+  binding, prover authorization, and local verifiability.
+
+  Delegation and invocation are secured by the same kind of mechanism; they
+  differ in the proof purpose and in what the mechanism must establish for it.
+  The document secured need not be a capability, and need not be JSON.
+
+  This lets the requirements this document already states about delegation —
+  which properties may be attenuated, and which `controller` must have
+  authorized a proof — be stated once rather than per proof format, and lets
+  future algorithms be specified against a mechanism selected by media type and
+  proof purpose rather than against a proof `type`. It also leaves room for a
+  mechanism that establishes prover authorization without disclosing a
+  delegated zcap's ancestry to the verifier, which a mechanism built on
+  `capabilityChain` cannot do.
+
+* Added [Capability Delegation Proofs with Data Integrity](index.html#capability-delegation-proofs-data-integrity),
+  a normative appendix that binds `DataIntegrityProof` to the abstraction above:
+  it states the mechanism's media types and proof purposes, the proof format,
+  that a proof is added and verified by the Add Proof and Verify Proof
+  algorithms of [[VC-DATA-INTEGRITY-1.1]], and how the mechanism establishes
+  each guarantee.
+
+  Conformance to this document does not require this mechanism. The appendix
+  exists so that the mechanism every example uses is specified rather than
+  merely described, while the rest of the document stays written against any
+  mechanism providing the same guarantees. It is a separate markdown file
+  included with `data-include`, as the [Change Log](index.html#changelog) is.
+
+  It defines no capability invocation proof. Binding the description in
+  [Invocation JSON `proof`](index.html#invocation-json-proof) to this
+  abstraction is left to the existing backlog items for invocation proofs.
+
 * Added [Creating a Capability Delegation Proof](index.html#creating-a-capability-delegation-proof),
   which states who may create one and what it must cover.
 
