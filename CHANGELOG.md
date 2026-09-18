@@ -5,6 +5,61 @@ This change log records changes that have been made since earlier versions of th
 Planned changes are described in [Milestones](index.html#milestones)
 Unscheduled possible changes are documented in [Backlog](index.html#backlog) until they are understood enough to schedule into Milestones.
 
+<h2 id="changelog-v0.5.0">v0.5.0</h2>
+
+This release contains normative changes.
+
+* Clarified the `proof` property of a delegated zcap, resolving the backlog
+  item [Clarify delegated capability `proof` property](index.html#clarify-delegated-capability-proof-property).
+  The item is kept, with each of its questions annotated with how it was
+  resolved and what was deliberately left to
+  [Specify algorithms for delegation proof](index.html#specify-algorithms-for-delegation-proof).
+
+  [capability delegation proof](index.html#dfn-capability-delegation-proof) is
+  now a defined term. It was used normatively in four places and defined in
+  none of them: a proof is one if its `proofPurpose` is `capabilityDelegation`
+  and it establishes that the delegated zcap was created by a controller of its
+  `parentCapability`.
+
+  The requirement that every proof in the `proof` property "express a DI proof"
+  is removed. It was stronger than anything a verifier needs and silent about
+  the one proof that matters. This document now states no requirement about a
+  proof that is not a capability delegation proof, and states that a verifier
+  MUST NOT rely on one.
+
+  The `type` of a capability delegation proof is not constrained. A
+  `DataIntegrityProof` is stated to satisfy the requirements, and is the type
+  every example uses, rather than being the only permitted type. The other
+  requirements in [Delegated Capability](index.html#delegated-capability) bind
+  whatever the type is, including `capabilityChain`.
+
+  For that type, the delegated zcap's `@context` SHOULD include
+  `https://w3id.org/security/data-integrity/v2`. The existing requirement on
+  `@context` already asks for the contexts that define the terms the delegation
+  proof uses, but the zcap v1 context defines neither `DataIntegrityProof` nor
+  `cryptosuite`, `verificationMethod` or `proofValue`, so it was possible to
+  satisfy the requirement as written while leaving those terms undefined. Every
+  example already includes this context.
+
+* Added [Creating a Capability Delegation Proof](index.html#creating-a-capability-delegation-proof),
+  which states who may create one and what it must cover.
+
+  Nothing previously said that a capability delegation proof must cover the
+  properties a verifier reads from the delegated zcap. Without that, the
+  attenuation requirements stated elsewhere in
+  [Delegated Capability](index.html#delegated-capability) are forgeable: a proof
+  could be valid over a document whose `expires` or `allowedAction` had been
+  changed after it was added.
+
+  The requirements a delegator must satisfy previously appeared only as
+  requirements upon a verifier. This gives them a counterpart a delegator can
+  follow, without specifying an algorithm.
+
+* Added a normative reference to
+  [Verifiable Credential Data Integrity 1.1](https://www.w3.org/TR/vc-data-integrity-1.1/),
+  cited where a `DataIntegrityProof` is mentioned. This is the document's first
+  bibliography citation, so it also gains a References section.
+
 <h2 id="changelog-v0.4.0">v0.4.0</h2>
 
 The goals of this release are

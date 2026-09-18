@@ -6,6 +6,13 @@
     <script src='//www.w3.org/Tools/respec/respec-w3c' class='remove'></script>    <script class='remove'>
      var respecConfig = {
          specStatus: "CG-DRAFT",
+         localBiblio: {
+             "VC-DATA-INTEGRITY-1.1": {
+                 title: "Verifiable Credential Data Integrity 1.1",
+                 href: "https://www.w3.org/TR/vc-data-integrity-1.1/",
+                 publisher: "W3C",
+             },
+         },
          subtitle: "An object capability framework for linked data systems",
          editors: [
              {name: "Christine Lemmer-Webber",
@@ -991,8 +998,7 @@ urn:uuid:{uuid}
         </p>
 
         <p>
-          A delegated zcap MUST have a capability delegation proof.
-          A capability delegation proof MUST have a `capabilityChain` property whose value is a <dfn>capability ancestors array</dfn>.
+          A [=capability delegation proof=] MUST have a `capabilityChain` property whose value is a <dfn>capability ancestors array</dfn>.
           A [=capability ancestors array=] MUST be an array that includes the root
           zcap using its ID (i.e., by reference only, not embedded) and every
           other delegated zcap in its ancestry must be referenced by ID except
@@ -1085,11 +1091,41 @@ urn:uuid:{uuid}
         </p>
 
         <p>
-          A delegated zcap MUST have a `proof` field that is an object or an
-          array of objects that each express a DI proof. At least one of these
-          proofs MUST be a zcap capability delegation proof.
-          <!-- TODO: more details on this proof -->
+          A delegated zcap MUST have a `proof` property whose value is either a
+          <dfn>capability delegation proof</dfn> or an array of proofs of which
+          at least one is a [=capability delegation proof=].
         </p>
+
+        <p>
+          A [=capability delegation proof=] is a proof whose `proofPurpose` is
+          `capabilityDelegation`, and which establishes that the delegated zcap
+          was created by a controller of its `parentCapability`.
+        </p>
+
+        <p>
+          This document does not constrain the `type` of a
+          [=capability delegation proof=].
+          A `DataIntegrityProof` [[VC-DATA-INTEGRITY-1.1]] satisfies the
+          requirements stated here, and is the type every example in this
+          document uses.
+          This document states no requirement about a proof in the `proof`
+          property that is not a [=capability delegation proof=], and a verifier
+          MUST NOT rely on such a proof to establish that a delegated zcap was
+          created by a controller of its `parentCapability`.
+        </p>
+
+        <p>
+          When a [=capability delegation proof=] is a `DataIntegrityProof`, the
+          delegated zcap's `@context` SHOULD include
+          `https://w3id.org/security/data-integrity/v2`, which is the context
+          that defines `DataIntegrityProof` and the terms such a proof carries,
+          among them `cryptosuite`, `verificationMethod` and `proofValue`.
+          The zcap v1 context defines `proof` and `capabilityChain`, but none of
+          those, so including it is how the requirement above on `@context` is
+          satisfied for a proof of that type.
+          Every example in this document includes it.
+        </p>
+
 
         <p>
           A capability delegator (one who creates a delegated zcap) may
@@ -1101,6 +1137,42 @@ urn:uuid:{uuid}
         </p>
 
 
+
+        <section id="creating-a-capability-delegation-proof">
+          <h2>Creating a Capability Delegation Proof</h2>
+
+          <p>
+            A [=capability delegation proof=] is created by the delegator, who
+            MUST be a controller of the `parentCapability` of the delegated
+            zcap.
+            It MUST be created using secret material of a verification method
+            that a controller of that `parentCapability` authorizes for the
+            `capabilityDelegation` proof purpose.
+          </p>
+
+          <p>
+            The proof MUST be created over the delegated zcap such that
+            verification fails if any of the delegated zcap's `id`,
+            `parentCapability`, `controller`, `invocationTarget`, `expires`,
+            `allowedAction` or `caveat` properties, or the proof's own
+            `proofPurpose` or `capabilityChain`, were modified after the proof
+            was added.
+            Those properties are what a verifier reads to determine the
+            authority the delegated zcap conveys, so a proof that does not cover
+            them conveys nothing.
+          </p>
+
+          <p>
+            When the [=capability delegation proof=] is a `DataIntegrityProof`,
+            it is created by the
+            <a href="https://www.w3.org/TR/vc-data-integrity-1.1/#add-proof">
+            Add Proof</a> algorithm of [[VC-DATA-INTEGRITY-1.1]], with the
+            delegated zcap as the unsecured data document and with proof options
+            whose `proofPurpose` is `capabilityDelegation` and whose
+            `capabilityChain` is the [=capability ancestors array=] of the
+            delegated zcap.
+          </p>
+        </section>
 
         <section id="delegated-capability-attenuation">
           <h2>URL Path- or Query-based Attenuation</h2>
@@ -1745,9 +1817,95 @@ Signature: zcap=:m28+dfHk1Pq6VvKxFxX9Q9zNz98bX5cKldP1M0zNzM3NzUzNzdXNzr1PzM3NzUz
                 </blockquote>
               </div>
               <ul>
-                <li>What is meant by "each express a DI proof"? Clarify or remove that clause.</li>
-                <li>Are non-DataIntegrityProof values allowed?</li>
-                <li>What is meant by "MUST be a zcap capability delegation proof"?</li>
+                <li>
+                  What is meant by "each express a DI proof"? Clarify or remove
+                  that clause.
+                  <ul>
+                    <li>
+                      Resolved: the clause is removed. It required every proof
+                      in the `proof` property to be a Data Integrity proof,
+                      which is both stronger than anything a verifier needs and
+                      silent about the one proof that matters.
+                      <a href="#delegated-capability">Delegated Capability</a>
+                      now states a requirement about the
+                      [=capability delegation proof=] instead, and states no
+                      requirement about any other proof in the property.
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  Are non-DataIntegrityProof values allowed?
+                  <ul>
+                    <li>
+                      Resolved: yes. This document does not constrain the `type`
+                      of a [=capability delegation proof=]. A
+                      `DataIntegrityProof` is stated to satisfy the
+                      requirements, and is the type every example uses, rather
+                      than being the only permitted type.
+                    </li>
+                    <li>
+                      Proposed, for the type that is allowed rather than
+                      required: when a [=capability delegation proof=] is a
+                      `DataIntegrityProof`, the delegated zcap's `@context`
+                      SHOULD include
+                      `https://w3id.org/security/data-integrity/v2`. The
+                      requirement on `@context` in
+                      <a href="#delegated-capability">Delegated Capability</a>
+                      already asks for the contexts that define the terms the
+                      delegation proof uses; the zcap v1 context does not define
+                      `DataIntegrityProof`, `cryptosuite`, `verificationMethod`
+                      or `proofValue`, so naming the one context that does is
+                      what makes that requirement actionable.
+                    </li>
+                    <li>
+                      The requirements stated in
+                      <a href="#delegated-capability">Delegated Capability</a>
+                      bind whatever the type is, including that a
+                      [=capability delegation proof=] have a `capabilityChain`.
+                      Whether that requirement belongs to this document or to a
+                      specification of one way of expressing a capability
+                      delegation proof is not resolved here; see
+                      <a href="#specify-algorithms-for-delegation-proof">Specify
+                      algorithms for delegation proof</a>.
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  What is meant by "MUST be a zcap capability delegation proof"?
+                  <ul>
+                    <li>
+                      Resolved: [=capability delegation proof=] is now a defined
+                      term. It was used normatively in four places and defined in
+                      none of them. A proof is one if its `proofPurpose` is
+                      `capabilityDelegation` and it establishes that the
+                      delegated zcap was created by a controller of its
+                      `parentCapability`.
+                    </li>
+                    <li>
+                      Not resolved: the `proof` property may still carry more
+                      than one [=capability delegation proof=], and this document
+                      does not say which one a verifier uses, or whether all of
+                      them must verify. The permissiveness of the original text
+                      is retained rather than decided, because narrowing it is a
+                      normative change with implementation impact and is not
+                      needed to answer the questions above.
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  Added, and resolved:
+                  <a href="#creating-a-capability-delegation-proof">Creating a
+                  Capability Delegation Proof</a> states who may create one and
+                  what it must cover, so that the requirements the original text
+                  placed on a verifier have a counterpart that a delegator can
+                  follow.
+                  Nothing in the original text said that a capability delegation
+                  proof must cover the properties a verifier reads from the
+                  delegated zcap, which is what makes the attenuation
+                  requirements elsewhere in
+                  <a href="#delegated-capability">Delegated Capability</a>
+                  unforgeable.
+                </li>
               </ul>
             </li>
             <li>
@@ -1755,8 +1913,33 @@ Signature: zcap=:m28+dfHk1Pq6VvKxFxX9Q9zNz98bX5cKldP1M0zNzM3NzUzNzdXNzr1PzM3NzUz
               <a href="https://www.w3.org/TR/vc-data-integrity-1.1/">
                 vc-data-integrity-1.1
               </a>.
+              <ul>
+                <li>
+                  Resolved: cited as [[VC-DATA-INTEGRITY-1.1]] from
+                  <a href="#delegated-capability">Delegated Capability</a> and
+                  from
+                  <a href="#creating-a-capability-delegation-proof">Creating a
+                  Capability Delegation Proof</a>, with a `localBiblio` entry so
+                  the citation does not depend on the shortname resolving in
+                  SpecRef.
+                  This is the document's first bibliography citation, so it also
+                  gains a References section.
+                </li>
+              </ul>
             </li>
           </ul>
+
+          <p>
+            The remaining work in this issue is what is deliberately left out
+            above: this document still has no statement of what a proof
+            mechanism is, so "does not constrain the `type`" is as far as it
+            goes, and the `capabilityChain` requirement still sits in the data
+            model rather than with a specification of one way to express a
+            capability delegation proof.
+            Both are addressed by
+            <a href="#specify-algorithms-for-delegation-proof">Specify
+            algorithms for delegation proof</a>.
+          </p>
         </section>
 
         <section>
