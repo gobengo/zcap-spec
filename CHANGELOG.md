@@ -33,13 +33,38 @@ This release contains normative changes.
   requirements in [Delegated Capability](index.html#delegated-capability) bind
   whatever the type is, including `capabilityChain`.
 
-  For that type, the delegated zcap's `@context` SHOULD include
-  `https://w3id.org/security/data-integrity/v2`. The existing requirement on
-  `@context` already asks for the contexts that define the terms the delegation
-  proof uses, but the zcap v1 context defines neither `DataIntegrityProof` nor
-  `cryptosuite`, `verificationMethod` or `proofValue`, so it was possible to
-  satisfy the requirement as written while leaving those terms undefined. Every
-  example already includes this context.
+  For that type, the delegated zcap's `@context` SHOULD define the terms the
+  proof uses, and SHOULD NOT include the Data Integrity context
+  `https://w3id.org/security/data-integrity/v2` in order to obtain them.
+  [Delegated Capability](index.html#delegated-capability) gives definitions
+  that are sufficient: `DataIntegrityProof`, `cryptosuite`, `created`,
+  `proofPurpose`, `proofValue` and `verificationMethod`, each as the Data
+  Integrity context defines it. The zcap v1 context already defines the rest of
+  what a delegation proof uses, including `proof`, `expires` and
+  `capabilityChain`.
+
+  The existing requirement on `@context` already asks for the contexts that
+  define the terms the delegation proof uses, but the zcap v1 context defines
+  none of those six, so it was possible to satisfy the requirement as written
+  while leaving them undefined.
+
+  The reason to prefer the definitions to the context URL is not size — the
+  object is larger on the wire. It is that what a zcap means should not depend
+  on a document this specification neither pins nor publishes. The zcap v1
+  context is pinned by its SHA2-256 digest and published alongside this
+  document; the Data Integrity context is neither, and defines more proof terms
+  than a zcap uses.
+
+  `proofPurpose` needs no nested context, because its `@type` of `@vocab`
+  expands its value against the active context, in which the zcap v1 context
+  already defines `capabilityDelegation` and `capabilityInvocation` as the same
+  IRIs the Data Integrity context's nested context does.
+
+  The example in [Delegated Capability](index.html#delegated-capability) is
+  updated to follow this. The figures in
+  [Zcap by Example](index.html#zcap-by-example) and
+  [Invocation](index.html#invocation) are not, and are noted in the backlog
+  item as remaining editorial work.
 
 * Added [Proofs](index.html#proofs) and, within it,
   [Proof Mechanism](index.html#proof-mechanism).
@@ -127,11 +152,26 @@ This release contains normative changes.
   the requirements across the whole chain, which is the subject of
   [Specify algorithms for delegation proof](index.html#specify-algorithms-for-delegation-proof).
 
+  In the backlog item
+  [Specify algorithms for delegation proof](index.html#specify-algorithms-for-delegation-proof),
+  the criterion asking for an algorithm that adds a `capabilityDelegation`
+  proof is annotated as resolved by `Delegate`, whose final step adds that
+  proof and whose earlier steps are the checks that must pass for it to be
+  worth adding. The criterion asking for a verification algorithm is not
+  resolved.
+
   Two diagrams accompany it, rendered from mermaid sources by the
   [respec-mermaid](https://github.com/w3c/respec-mermaid) plugin: a flow chart
   of the course the steps take and the error each failing check raises, and a
   class diagram of the algorithm's signature and the things it relates. This is
   the document's first use of that plugin.
+
+* Added [Algorithms](index.html#algorithms), an index. It names each algorithm
+  this document defines, with its signature and a one-sentence description, and
+  links to the section that defines it. Each algorithm is defined alongside the
+  data model it operates on rather than collected there, and each error is
+  specified by the step that raises it, so there is no unified list of error
+  definitions.
 
 * Added a normative reference to
   [Verifiable Credential Data Integrity 1.1](https://www.w3.org/TR/vc-data-integrity-1.1/),

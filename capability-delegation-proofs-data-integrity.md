@@ -49,10 +49,11 @@ secured by this mechanism is an object with the following properties.
 | `capabilityChain` | The [capability ancestors array](index.html#dfn-capability-ancestors-array) of the delegated zcap, as required by [Delegated Capability](index.html#delegated-capability). |
 | `proofValue` | The output of the cryptosuite, as defined by [[VC-DATA-INTEGRITY-1.1]]. |
 
-The delegated zcap's `@context` SHOULD include
-`https://w3id.org/security/data-integrity/v2`, which defines
-`DataIntegrityProof` and the terms above that the zcap v1 context does not, as
-described in [Delegated Capability](index.html#delegated-capability).
+The delegated zcap's `@context` SHOULD define the terms above that the zcap v1
+context does not, and SHOULD NOT include the Data Integrity context
+`https://w3id.org/security/data-integrity/v2` in order to obtain them.
+[Delegated Capability](index.html#delegated-capability) gives definitions that
+are sufficient, and says why they are preferred to the context URL.
 
 ## Adding a Proof
 

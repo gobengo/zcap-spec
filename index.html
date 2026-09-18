@@ -1099,7 +1099,30 @@ urn:zcap:root:${encodeURIComponent(invocationTarget)}
 {
   "@context": [
     "https://w3id.org/zcap/v1",
-    "https://w3id.org/security/data-integrity/v2"
+    {
+      "@protected": true,
+      "DataIntegrityProof": "https://w3id.org/security#DataIntegrityProof",
+      "created": {
+        "@id": "http://purl.org/dc/terms/created",
+        "@type": "http://www.w3.org/2001/XMLSchema#dateTime"
+      },
+      "cryptosuite": {
+        "@id": "https://w3id.org/security#cryptosuite",
+        "@type": "https://w3id.org/security#cryptosuiteString"
+      },
+      "proofPurpose": {
+        "@id": "https://w3id.org/security#proofPurpose",
+        "@type": "@vocab"
+      },
+      "proofValue": {
+        "@id": "https://w3id.org/security#proofValue",
+        "@type": "https://w3id.org/security#multibase"
+      },
+      "verificationMethod": {
+        "@id": "https://w3id.org/security#verificationMethod",
+        "@type": "@id"
+      }
+    }
   ],
   "id": "urn:uuid:cdc77118-6bfa-11ec-aceb-10bf48838a41",
   "parentCapability": "urn:zcap:root:https%3A%2F%2Fexample.com%2Ffoo",
@@ -1290,15 +1313,75 @@ urn:uuid:{uuid}
 
         <p>
           When a [=capability delegation proof=] is a `DataIntegrityProof`, the
-          delegated zcap's `@context` SHOULD include
-          `https://w3id.org/security/data-integrity/v2`, which is the context
-          that defines `DataIntegrityProof` and the terms such a proof carries,
-          among them `cryptosuite`, `verificationMethod` and `proofValue`.
-          The zcap v1 context defines `proof` and `capabilityChain`, but none of
-          those, so including it is how the requirement above on `@context` is
-          satisfied for a proof of that type.
-          Every example in this document includes it.
+          delegated zcap's `@context` SHOULD define the terms that proof uses
+          directly, and SHOULD NOT include the Data Integrity context
+          `https://w3id.org/security/data-integrity/v2` in order to obtain
+          them.
+          The <a href="#zcap-v1-context">zcap v1 JSON-LD Context</a> already
+          defines `proof`, `expires`, `capabilityChain`,
+          `capabilityDelegation` and `capabilityInvocation`.
+          The terms a `DataIntegrityProof` adds to those are
+          `DataIntegrityProof` itself, `cryptosuite`, `created`,
+          `proofPurpose`, `proofValue` and `verificationMethod`, and defining
+          them as follows is sufficient:
         </p>
+
+        <pre class="example highlight javascript">
+{
+  "@protected": true,
+  "DataIntegrityProof": "https://w3id.org/security#DataIntegrityProof",
+  "created": {
+    "@id": "http://purl.org/dc/terms/created",
+    "@type": "http://www.w3.org/2001/XMLSchema#dateTime"
+  },
+  "cryptosuite": {
+    "@id": "https://w3id.org/security#cryptosuite",
+    "@type": "https://w3id.org/security#cryptosuiteString"
+  },
+  "proofPurpose": {
+    "@id": "https://w3id.org/security#proofPurpose",
+    "@type": "@vocab"
+  },
+  "proofValue": {
+    "@id": "https://w3id.org/security#proofValue",
+    "@type": "https://w3id.org/security#multibase"
+  },
+  "verificationMethod": {
+    "@id": "https://w3id.org/security#verificationMethod",
+    "@type": "@id"
+  }
+}
+        </pre>
+
+        <p>
+          Each definition above is the one the Data Integrity context gives
+          for that term, so a zcap whose `@context` is the zcap v1 context
+          followed by the object above expands to the same RDF as the same zcap
+          whose `@context` is the zcap v1 context followed by the Data
+          Integrity context.
+          None of the six terms is defined by the zcap v1 context, so defining
+          them does not conflict with its protected terms.
+          `proofPurpose` needs no nested context: its `@type` of `@vocab`
+          expands its value against the active context, in which the zcap v1
+          context already defines `capabilityDelegation` and
+          `capabilityInvocation` as the same IRIs the Data Integrity context's
+          nested context does.
+        </p>
+
+        <div class="note">
+          <p>
+            The reason to prefer the definitions above to the context URL is
+            not size &mdash; the object is larger on the wire than the URL is.
+            It is that what a zcap means should not depend on a document this
+            specification does not control.
+            <a href="#zcap-v1-context">The zcap v1 JSON-LD Context</a> is
+            pinned here by its SHA2-256 digest and published alongside this
+            document; the Data Integrity context is neither, so including it
+            makes the meaning of a zcap depend on the content of a document at
+            a URL, and on whatever that document defines, which is more than a
+            zcap uses.
+          </p>
+        </div>
 
 
         <p>
@@ -2007,6 +2090,37 @@ Signature: zcap=:m28+dfHk1Pq6VvKxFxX9Q9zNz98bX5cKldP1M0zNzM3NzUzNzdXNzr1PzM3NzUz
       </section>
     </section>
 
+    <section id="algorithms">
+      <h2>Algorithms</h2>
+
+      <p>
+        Each algorithm this document defines is listed below.
+        Each is defined alongside the data model it operates on rather than
+        collected here, and each error is specified by the step that
+        [=fails=] with it.
+      </p>
+
+      <section id="algorithm-delegate">
+        <h2>Delegate</h2>
+
+        <p>
+          <a href="#delegate">delegate</a> produces a delegated zcap carrying a
+          [=capability delegation proof=], from a delegated zcap that does not
+          yet carry one and the capability being delegated.
+        </p>
+
+        <pre>
+delegate(unsecuredDelegatedZcap, parentCapability, parentAncestry,
+         proofMechanism, options) &rarr; delegated zcap
+        </pre>
+
+        <p>
+          It is defined in <a href="#delegate">Delegate</a>, within
+          <a href="#capabilities">Capabilities</a>.
+        </p>
+      </section>
+    </section>
+
     <section class="informative" id="zcap-v1-context">
       <h2>The zcap v1 JSON-LD Context</h2>
 
@@ -2298,15 +2412,27 @@ Signature: zcap=:m28+dfHk1Pq6VvKxFxX9Q9zNz98bX5cKldP1M0zNzM3NzUzNzdXNzr1PzM3NzUz
                       Proposed, for the type that is allowed rather than
                       required: when a [=capability delegation proof=] is a
                       `DataIntegrityProof`, the delegated zcap's `@context`
-                      SHOULD include
-                      `https://w3id.org/security/data-integrity/v2`. The
-                      requirement on `@context` in
+                      SHOULD define the six terms such a proof uses that the
+                      zcap v1 context does not, and SHOULD NOT include the Data
+                      Integrity context in order to obtain them.
+                      The requirement on `@context` in
                       <a href="#delegated-capability">Delegated Capability</a>
                       already asks for the contexts that define the terms the
-                      delegation proof uses; the zcap v1 context does not define
-                      `DataIntegrityProof`, `cryptosuite`, `verificationMethod`
-                      or `proofValue`, so naming the one context that does is
-                      what makes that requirement actionable.
+                      delegation proof uses; giving the definitions is what
+                      makes that requirement actionable without making the
+                      meaning of a zcap depend on a document this specification
+                      neither pins nor publishes.
+                    </li>
+                    <li>
+                      Not resolved: the figures in
+                      <a href="#zcap-by-example">Zcap by Example</a> and
+                      <a href="#invocation">Invocation</a> still include the
+                      Data Integrity context rather than the definitions, so
+                      they do not yet follow the recommendation above.
+                      The example in
+                      <a href="#delegated-capability">Delegated Capability</a>
+                      does. Updating the rest is editorial and is left out of
+                      this change to keep it reviewable.
                     </li>
                     <li>
                       Where `DataIntegrityProof` is bound to what this document
@@ -2419,6 +2545,32 @@ Signature: zcap=:m28+dfHk1Pq6VvKxFxX9Q9zNz98bX5cKldP1M0zNzM3NzUzNzdXNzr1PzM3NzUz
               <a href="https://www.w3.org/TR/vc-data-integrity/#add-proof">
                 Add Proof in VC Data Integrity.
               </a>
+              <ul>
+                <li>
+                  Resolved by <a href="#delegate">Delegate</a>, whose output is
+                  a delegated zcap carrying a
+                  [=capability delegation proof=].
+                  Its final step adds that proof, by performing the add
+                  operation of a [=proof mechanism=] with a proof purpose of
+                  `capabilityDelegation`, which is the step this criterion asks
+                  for.
+                  The steps before it are the checks that must pass for the
+                  proof to be worth adding: that the delegation narrows its
+                  parent's authority, that the chain is not too long, and that
+                  the delegator is authorized.
+                </li>
+                <li>
+                  It is similar to
+                  <a href="https://www.w3.org/TR/vc-data-integrity/#add-proof">Add
+                  Proof</a> in shape rather than by delegating to it.
+                  <a href="#delegate">Delegate</a> takes the securing operation
+                  as a [=proof mechanism=], so it does not require a
+                  `DataIntegrityProof`;
+                  <a href="#capability-delegation-proofs-data-integrity">Capability
+                  Delegation Proofs with Data Integrity</a> is where Add Proof
+                  is named, as the add operation of that one mechanism.
+                </li>
+              </ul>
             </li>
             <li>
               Specify an algorithm to verify a `capabilityDelegation` proof on a delegated capability.
