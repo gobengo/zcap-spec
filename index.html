@@ -647,6 +647,47 @@
           computer programming.)
         </dd>
 
+        <dt>proof mechanism</dt>
+        <dd>
+          A specification that defines how a document is secured for a proof
+          purpose, and how a verifier determines that a secured document has
+          not been modified since.
+          A capability delegation proof and a capability invocation proof are
+          each produced and verified by one.
+          What any mechanism must define and must guarantee is stated in
+          <a href="#proof-mechanism">Proof Mechanism</a>; the mechanism this
+          document defines is
+          <a href="#capability-delegation-proofs-data-integrity">Capability
+          Delegation Proofs with Data Integrity</a>.
+        </dd>
+
+        <dt>capability delegation proof</dt>
+        <dd>
+          The proof that secures a delegated capability, establishing that it
+          was created by a controller of its parent capability.
+          Every delegated capability has one; what it must be is stated in
+          <a href="#delegated-capability">Delegated Capability</a>, how one is
+          created in
+          <a href="#creating-a-capability-delegation-proof">Creating a
+          Capability Delegation Proof</a> and in
+          <a href="#delegate">Delegate</a>, and what it must establish in
+          <a href="#proof-mechanism">Proof Mechanism</a>.
+          <a href="#capability-delegation-proofs-data-integrity">Capability
+          Delegation Proofs with Data Integrity</a> expresses one as a
+          `DataIntegrityProof`.
+        </dd>
+
+        <dt>capability invocation proof</dt>
+        <dd>
+          The proof that secures an invocation, establishing that it was created
+          by a controller of the capability it invokes.
+          How an invocation carries one is described in
+          <a href="#invocation">Invocation</a>, for an
+          <a href="#invocation-http-request">invocation HTTP request</a> and for
+          <a href="#invocation-json">invocation JSON</a>, and what it must
+          establish in <a href="#proof-mechanism">Proof Mechanism</a>.
+        </dd>
+
         <dt>parentCapability</dt>
         <dd>
           The previous capability document on the chain, which is granting
@@ -674,169 +715,6 @@
           </ul>
         </dd>
       </dl>
-    </section>
-
-    <section id="proofs">
-      <h2>Proofs</h2>
-
-      <p>
-        A capability is granted by delegating it and enacted by invoking it, and
-        both are secured by a proof.
-        This section says what a proof of either kind must establish, without
-        saying how any particular proof is expressed.
-      </p>
-
-      <p>
-        A <dfn data-lt="capability proof|capability proofs">capability
-        proof</dfn> is a proof whose proof purpose is `capabilityDelegation` or
-        `capabilityInvocation`.
-        There are two kinds: a [=capability delegation proof=], defined in
-        <a href="#delegated-capability">Delegated Capability</a>, and a
-        <dfn data-lt="capability invocation proof|capability invocation proofs">capability
-        invocation proof</dfn>, which is a proof whose `proofPurpose` is
-        `capabilityInvocation` and which establishes that an invocation was
-        created by a controller of the capability it invokes.
-      </p>
-
-      <section id="proof-mechanism">
-        <h2>Proof Mechanism</h2>
-
-        <p>
-          A <dfn data-lt="proof mechanism|proof mechanisms">proof
-          mechanism</dfn> is a specification that defines how a document is
-          secured for a proof purpose, and how a verifier determines that a
-          secured document has not been modified since it was secured.
-          A [=capability proof=] is produced and verified by a
-          [=proof mechanism=].
-        </p>
-
-        <p>
-          Capability delegation and capability invocation are secured by the
-          same kind of mechanism.
-          They differ in the proof purpose, and in what the mechanism is
-          required to establish for that purpose.
-          The document a mechanism secures need not be a capability, and need
-          not be JSON: an
-          <a href="#invocation-http-request">HTTP request</a> that invokes a
-          capability is a secured document too.
-        </p>
-
-        <p>
-          A [=proof mechanism=] specification MUST define an operation that adds
-          a proof to a document, taking the unsecured document, a proof purpose,
-          whatever else that mechanism requires in order to establish the
-          guarantees below, and a set of options that includes a verification
-          method, and producing either a secured document or an error.
-        </p>
-
-        <p>
-          A [=proof mechanism=] specification MUST define an operation that
-          verifies a proof, taking a secured document, an expected proof
-          purpose, and a set of options, and producing a result that states
-          whether verification succeeded and, if it did not, why.
-        </p>
-
-        <p>
-          A [=proof mechanism=] specification MUST state the media types of the
-          documents it secures and the proof purposes it defines proofs for.
-          A verifier presented with a document selects a [=proof mechanism=]
-          whose media types include the media type of that document and whose
-          proof purposes include the purpose it expects.
-        </p>
-
-        <p>
-          A [=proof mechanism=] MUST guarantee the following properties.
-        </p>
-
-        <dl>
-
-          <dt>Purpose binding</dt>
-          <dd>
-            The proof is bound to the proof purpose it was created for, such
-            that a proof created for one purpose cannot be presented as a proof
-            for another.
-            In particular, a [=capability invocation proof=] cannot be presented
-            as a [=capability delegation proof=], nor the reverse.
-          </dd>
-
-          <dt>Prover authorization</dt>
-          <dd>
-            Verification establishes that the proof was created using secret
-            material of a verification method that was authorized for the proof
-            purpose by the appropriate `controller`.
-            For a [=capability delegation proof=], that is a `controller` of the
-            delegated zcap's `parentCapability`.
-            For a [=capability invocation proof=], that is a `controller` of the
-            capability being invoked.
-          </dd>
-
-          <dt>Local verifiability</dt>
-          <dd>
-            Verification does not require dereferencing any capability by ID,
-            as required by
-            <a href="#delegated-capability">Delegated Capability</a>.
-            Retrieval of verification methods, and dereferencing of the root
-            zcap, are out of scope of this requirement.
-          </dd>
-        </dl>
-
-        <p>
-          A [=proof mechanism=] MAY establish prover authorization by disclosing
-          a delegated zcap's ancestry to the verifier, or without disclosing it.
-        </p>
-
-        <p>
-          This document defines one [=proof mechanism=], in
-          <a href="#capability-delegation-proofs-data-integrity">Capability
-          Delegation Proofs with Data Integrity</a>.
-          It is not required: an implementation may use any mechanism that
-          provides the guarantees above.
-        </p>
-
-        <table class="simple">
-          <thead>
-            <tr>
-              <th>Mechanism</th>
-              <th>Media types</th>
-              <th>Proof purposes</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>
-                The
-                [=Data Integrity capability delegation proof mechanism=]
-              </td>
-              <td>`application/json`</td>
-              <td>`capabilityDelegation`</td>
-            </tr>
-          </tbody>
-        </table>
-
-        <div class="note">
-          <p>
-            This document states requirements upon delegators and verifiers that
-            do not depend on how a capability is secured: which properties may
-            be attenuated, that authority is only ever narrowed, and which
-            `controller` must have authorized a proof.
-            Stating them against a [=proof mechanism=] rather than against one
-            way of expressing a proof is what allows those requirements to be
-            specified once, and allows a mechanism that discloses a delegated
-            zcap's ancestry to a verifier and a mechanism that does not to
-            satisfy the same requirements.
-          </p>
-          <p>
-            It is also what allows algorithms to be specified against a
-            mechanism rather than against a proof format: an algorithm can take
-            the set of mechanisms available to a verifier, select one by media
-            type and proof purpose, and rely on the guarantees above without
-            naming a proof `type`.
-            Those algorithms are not yet specified; see
-            <a href="#specify-algorithms-for-delegation-proof">Specify
-            algorithms for delegation proof</a>.
-          </p>
-        </div>
-      </section>
     </section>
 
     <section id="capabilities">
@@ -1558,7 +1436,10 @@ delegate(unsecuredDelegatedZcap, parentCapability, parentAncestry,
           </dd>
 
           <dt>`proofMechanism`</dt>
-          <dd>A [=proof mechanism=].</dd>
+          <dd>
+            A [=proof mechanism=], as defined in
+            <a href="#proof-mechanism">Proof Mechanism</a>.
+          </dd>
 
           <dt>`options`</dt>
           <dd>
@@ -2090,6 +1971,171 @@ Signature: zcap=:m28+dfHk1Pq6VvKxFxX9Q9zNz98bX5cKldP1M0zNzM3NzUzNzdXNzr1PzM3NzUz
       </section>
     </section>
 
+    <section id="proofs">
+      <h2>Proofs</h2>
+
+      <p>
+        A capability is granted by delegating it and enacted by invoking it, and
+        both are secured by a proof.
+        This section says what a proof of either kind must establish, without
+        saying how any particular proof is expressed.
+      </p>
+
+      <p>
+        A <dfn data-lt="capability proof|capability proofs">capability
+        proof</dfn> is a proof whose proof purpose is `capabilityDelegation` or
+        `capabilityInvocation`.
+        There are two kinds: a [=capability delegation proof=], defined in
+        <a href="#delegated-capability">Delegated Capability</a>, and a
+        <dfn data-lt="capability invocation proof|capability invocation proofs">capability
+        invocation proof</dfn>, which is a proof whose `proofPurpose` is
+        `capabilityInvocation` and which establishes that an invocation was
+        created by a controller of the capability it invokes.
+      </p>
+
+      <section id="proof-mechanism">
+        <h2>Proof Mechanism</h2>
+
+        <p>
+          A <dfn data-lt="proof mechanism|proof mechanisms">proof
+          mechanism</dfn> is a specification that defines how a document is
+          secured for a proof purpose, and how a verifier determines that a
+          secured document has not been modified since it was secured.
+          A [=capability proof=] is produced and verified by a
+          [=proof mechanism=].
+        </p>
+
+        <p>
+          Capability delegation and capability invocation are secured by the
+          same kind of mechanism.
+          They differ in the proof purpose, and in what the mechanism is
+          required to establish for that purpose.
+          The document a mechanism secures need not be a capability, and need
+          not be JSON: an
+          <a href="#invocation-http-request">HTTP request</a> that invokes a
+          capability is a secured document too.
+        </p>
+
+        <p>
+          A [=proof mechanism=] specification MUST define an operation that adds
+          a proof to a document, taking the unsecured document, a proof purpose,
+          whatever else that mechanism requires in order to establish the
+          guarantees below, and a set of options that includes a verification
+          method, and producing either a secured document or an error.
+        </p>
+
+        <p>
+          A [=proof mechanism=] specification MUST define an operation that
+          verifies a proof, taking a secured document, an expected proof
+          purpose, and a set of options, and producing a result that states
+          whether verification succeeded and, if it did not, why.
+        </p>
+
+        <p>
+          A [=proof mechanism=] specification MUST state the media types of the
+          documents it secures and the proof purposes it defines proofs for.
+          A verifier presented with a document selects a [=proof mechanism=]
+          whose media types include the media type of that document and whose
+          proof purposes include the purpose it expects.
+        </p>
+
+        <p>
+          A [=proof mechanism=] MUST guarantee the following properties.
+        </p>
+
+        <dl>
+
+          <dt>Purpose binding</dt>
+          <dd>
+            The proof is bound to the proof purpose it was created for, such
+            that a proof created for one purpose cannot be presented as a proof
+            for another.
+            In particular, a [=capability invocation proof=] cannot be presented
+            as a [=capability delegation proof=], nor the reverse.
+          </dd>
+
+          <dt>Prover authorization</dt>
+          <dd>
+            Verification establishes that the proof was created using secret
+            material of a verification method that was authorized for the proof
+            purpose by the appropriate `controller`.
+            For a [=capability delegation proof=], that is a `controller` of the
+            delegated zcap's `parentCapability`.
+            For a [=capability invocation proof=], that is a `controller` of the
+            capability being invoked.
+          </dd>
+
+          <dt>Local verifiability</dt>
+          <dd>
+            Verification does not require dereferencing any capability by ID,
+            as required by
+            <a href="#delegated-capability">Delegated Capability</a>.
+            Retrieval of verification methods, and dereferencing of the root
+            zcap, are out of scope of this requirement.
+          </dd>
+        </dl>
+
+        <p>
+          A [=proof mechanism=] MAY establish prover authorization by disclosing
+          a delegated zcap's ancestry to the verifier, or without disclosing it.
+        </p>
+
+        <p>
+          This document defines one [=proof mechanism=], in
+          <a href="#capability-delegation-proofs-data-integrity">Capability
+          Delegation Proofs with Data Integrity</a>.
+          It is not required: an implementation may use any mechanism that
+          provides the guarantees above.
+        </p>
+
+        <table class="simple">
+          <thead>
+            <tr>
+              <th>Mechanism</th>
+              <th>Media types</th>
+              <th>Proof purposes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                The
+                [=Data Integrity capability delegation proof mechanism=]
+              </td>
+              <td>`application/json`</td>
+              <td>`capabilityDelegation`</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="note">
+          <p>
+            This document states requirements upon delegators and verifiers that
+            do not depend on how a capability is secured: which properties may
+            be attenuated, that authority is only ever narrowed, and which
+            `controller` must have authorized a proof.
+            Stating them against a [=proof mechanism=] rather than against one
+            way of expressing a proof is what allows those requirements to be
+            specified once, and allows a mechanism that discloses a delegated
+            zcap's ancestry to a verifier and a mechanism that does not to
+            satisfy the same requirements.
+          </p>
+          <p>
+            It is also what allows an algorithm to be specified against a
+            mechanism rather than against a proof format.
+            <a href="#delegate">Delegate</a> is one: it is given a
+            [=proof mechanism=] and adds a proof with it, and so names no proof
+            `type`.
+            An algorithm that verifies would instead be given the set of
+            mechanisms available to a verifier and select one by media type and
+            proof purpose. No such algorithm is specified here; see
+            <a href="#specify-algorithms-for-delegation-proof">Specify
+            algorithms for delegation proof</a>.
+          </p>
+        </div>
+      </section>
+    </section>
+
     <section id="algorithms">
       <h2>Algorithms</h2>
 
@@ -2579,6 +2625,13 @@ delegate(unsecuredDelegatedZcap, parentCapability, parentAncestry,
                 Verify Proof in VC Data Integrity
               </a>
               (but for zcap delegations).
+
+              <ul>
+                <li>
+                  Work on final verification algorithms depends on proof generation algorithms.
+                  Work should continue here after an consensus on an initial minimal <a href="#delegate">Delegate</a>  algorithm.
+                </li>
+              </ul>
             </li>
           </ul>
         </section>

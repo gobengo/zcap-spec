@@ -67,7 +67,10 @@ This release contains normative changes.
   item as remaining editorial work.
 
 * Added [Proofs](index.html#proofs) and, within it,
-  [Proof Mechanism](index.html#proof-mechanism).
+  [Proof Mechanism](index.html#proof-mechanism), placed after
+  [Capabilities](index.html#capabilities) and
+  [Invocation](index.html#invocation) so that a reader meets delegation and
+  invocation before the abstraction over how either is secured.
 
   [capability proof](index.html#dfn-capability-proof) names what a
   [capability delegation proof](index.html#dfn-capability-delegation-proof) and
@@ -165,6 +168,12 @@ This release contains normative changes.
   of the course the steps take and the error each failing check raises, and a
   class diagram of the algorithm's signature and the things it relates. This is
   the document's first use of that plugin.
+
+* Added `proof mechanism`, `capability delegation proof` and
+  `capability invocation proof` to
+  [Terminology](index.html#terminology), each with the sections that state what
+  it must be, how it is created, and what it must establish. All three terms
+  were used throughout the document without appearing there.
 
 * Added [Algorithms](index.html#algorithms), an index. It names each algorithm
   this document defines, with its signature and a one-sentence description, and
