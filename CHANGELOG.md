@@ -175,6 +175,23 @@ This release contains normative changes.
   it must be, how it is created, and what it must establish. All three terms
   were used throughout the document without appearing there.
 
+* Every entry in [Terminology](index.html#terminology) can now be linked to.
+  Each term carries an `id` of the form `term-{term}`, so
+  [#term-caveat](index.html#term-caveat) addresses that entry, and the six
+  entries that this document did not already define elsewhere — `capability`,
+  `target`, `capability chain`, `caveat`, `invocation` and `action` — plus
+  `parentCapability` and `capabilityDelegation` are now definitions, so they
+  can be cross-referenced from prose as well.
+
+  `proof mechanism`, `capability delegation proof` and
+  `capability invocation proof` are not defined in Terminology, because each is
+  defined where the requirements that constrain it are stated; their
+  Terminology entries describe them and link there. A second definition of the
+  same term would be an error rather than a second place to link to.
+
+  Each new definition is referenced from prose, so that adding them does not
+  leave the document with definitions nothing points at.
+
 * Added [Algorithms](index.html#algorithms), an index. It names each algorithm
   this document defines, with its signature and a one-sentence description, and
   links to the section that defines it. Each algorithm is defined alongside the

@@ -598,18 +598,18 @@
       <h2>Terminology</h2>
       <!-- TODO: Add introductory paragraph to this section -->
       <dl>
-        <dt>capability</dt>
+        <dt id="term-capability"><dfn data-lt="capability|capabilities">capability</dfn></dt>
         <dd>
           Authority which may be invoked to perform some operation upon a
           (linked data) object.
         </dd>
 
-        <dt>target</dt>
+        <dt id="term-target"><dfn data-lt="target|targets">target</dfn></dt>
         <dd>
           The entity that will be acted upon when the capability is invoked.
         </dd>
 
-        <dt>capability chain</dt>
+        <dt id="term-capability-chain"><dfn data-lt="capability chain|capability chains">capability chain</dfn></dt>
         <dd>
           A chain of capability documents which may be used to delegate
           authority to other entities in the system.
@@ -618,7 +618,7 @@
           entities which have existing authority within the chain.
         </dd>
 
-        <dt>caveat</dt>
+        <dt id="term-caveat"><dfn data-lt="caveat|caveats">caveat</dfn></dt>
         <dd>
           Also known as "attenuation" within object capability literature,
           a "caveat" may be attached to a capability as a restriction on
@@ -627,7 +627,7 @@
           may be further restricted by adding more caveats.
         </dd>
 
-        <dt>invocation</dt>
+        <dt id="term-invocation"><dfn data-lt="invocation|invocations">invocation</dfn></dt>
         <dd>
           The "activation" of a capability, represented as a linked data
           document which is signed in such a way that matches authority
@@ -637,7 +637,7 @@
           may have arguments.
         </dd>
 
-        <dt>action</dt>
+        <dt id="term-action"><dfn data-lt="action|actions">action</dfn></dt>
         <dd>
           An argument of an invocation which directs what particular
           functionality of the object is being used.
@@ -647,7 +647,7 @@
           computer programming.)
         </dd>
 
-        <dt>proof mechanism</dt>
+        <dt id="term-proof-mechanism">proof mechanism</dt>
         <dd>
           A specification that defines how a document is secured for a proof
           purpose, and how a verifier determines that a secured document has
@@ -661,10 +661,11 @@
           Delegation Proofs with Data Integrity</a>.
         </dd>
 
-        <dt>capability delegation proof</dt>
+        <dt id="term-capability-delegation-proof">capability delegation proof</dt>
         <dd>
           The proof that secures a delegated capability, establishing that it
-          was created by a controller of its parent capability.
+          was created by a controller of its
+          [=parentCapability|parent capability=].
           Every delegated capability has one; what it must be is stated in
           <a href="#delegated-capability">Delegated Capability</a>, how one is
           created in
@@ -677,7 +678,7 @@
           `DataIntegrityProof`.
         </dd>
 
-        <dt>capability invocation proof</dt>
+        <dt id="term-capability-invocation-proof">capability invocation proof</dt>
         <dd>
           The proof that secures an invocation, establishing that it was created
           by a controller of the capability it invokes.
@@ -688,15 +689,15 @@
           establish in <a href="#proof-mechanism">Proof Mechanism</a>.
         </dd>
 
-        <dt>parentCapability</dt>
+        <dt id="term-parentcapability"><dfn>parentCapability</dfn></dt>
         <dd>
           The previous capability document on the chain, which is granting
           authority to this invocation document.
           In the case of the first delegated capability document, this points
-          at the target.
+          at the [=target=].
         </dd>
 
-        <dt>capabilityDelegation</dt>
+        <dt id="term-capabilitydelegation"><dfn>capabilityDelegation</dfn></dt>
         <dd>
           This term serves two purposes:
           <ul>
@@ -1492,8 +1493,8 @@ delegate(unsecuredDelegatedZcap, parentCapability, parentAncestry,
               </li>
               <li>
                 If `parentCapability` has an `allowedAction` and
-                `unsecuredDelegatedZcap` expresses an action that it does not,
-                [=fail=] with `INVALID_ALLOWED_ACTION`.
+                `unsecuredDelegatedZcap` expresses an [=action=] that it does
+                not, [=fail=] with `INVALID_ALLOWED_ACTION`.
               </li>
               <li>
                 If `parentCapability` has an `expires` and that of
@@ -1627,10 +1628,12 @@ classDiagram
             against the whole [=capability ancestry=].
             That is sound for a delegator, because every ancestor was itself
             checked against its own parent when it was delegated, so narrowing
-            at each hop narrows the chain.
+            at each hop narrows the chain, and because a [=caveat=] expressed by
+            an ancestor restricts every zcap delegated from it however the chain
+            was built.
             A verifier cannot rely on that, and must apply the requirements
-            across the whole chain; the algorithm that does so is not specified
-            here, and is the subject of
+            across the whole [=capability chain=]; the algorithm that does so is
+            not specified here, and is the subject of
             <a href="#specify-algorithms-for-delegation-proof">Specify
             algorithms for delegation proof</a>.
           </p>
@@ -1975,8 +1978,8 @@ Signature: zcap=:m28+dfHk1Pq6VvKxFxX9Q9zNz98bX5cKldP1M0zNzM3NzUzNzdXNzr1PzM3NzUz
       <h2>Proofs</h2>
 
       <p>
-        A capability is granted by delegating it and enacted by invoking it, and
-        both are secured by a proof.
+        A [=capability=] is granted by delegating it and enacted by invoking
+        it, and both are secured by a proof.
         This section says what a proof of either kind must establish, without
         saying how any particular proof is expressed.
       </p>
@@ -1989,8 +1992,8 @@ Signature: zcap=:m28+dfHk1Pq6VvKxFxX9Q9zNz98bX5cKldP1M0zNzM3NzUzNzdXNzr1PzM3NzUz
         <a href="#delegated-capability">Delegated Capability</a>, and a
         <dfn data-lt="capability invocation proof|capability invocation proofs">capability
         invocation proof</dfn>, which is a proof whose `proofPurpose` is
-        `capabilityInvocation` and which establishes that an invocation was
-        created by a controller of the capability it invokes.
+        `capabilityInvocation` and which establishes that an [=invocation=]
+        was created by a controller of the capability it invokes.
       </p>
 
       <section id="proof-mechanism">
@@ -2006,8 +2009,8 @@ Signature: zcap=:m28+dfHk1Pq6VvKxFxX9Q9zNz98bX5cKldP1M0zNzM3NzUzNzdXNzr1PzM3NzUz
         </p>
 
         <p>
-          Capability delegation and capability invocation are secured by the
-          same kind of mechanism.
+          [=capabilityDelegation|Capability delegation=] and capability
+          invocation are secured by the same kind of mechanism.
           They differ in the proof purpose, and in what the mechanism is
           required to establish for that purpose.
           The document a mechanism secures need not be a capability, and need
