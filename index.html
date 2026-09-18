@@ -978,30 +978,7 @@ urn:zcap:root:${encodeURIComponent(invocationTarget)}
 {
   "@context": [
     "https://w3id.org/zcap/v1",
-    {
-      "@protected": true,
-      "DataIntegrityProof": "https://w3id.org/security#DataIntegrityProof",
-      "created": {
-        "@id": "http://purl.org/dc/terms/created",
-        "@type": "http://www.w3.org/2001/XMLSchema#dateTime"
-      },
-      "cryptosuite": {
-        "@id": "https://w3id.org/security#cryptosuite",
-        "@type": "https://w3id.org/security#cryptosuiteString"
-      },
-      "proofPurpose": {
-        "@id": "https://w3id.org/security#proofPurpose",
-        "@type": "@vocab"
-      },
-      "proofValue": {
-        "@id": "https://w3id.org/security#proofValue",
-        "@type": "https://w3id.org/security#multibase"
-      },
-      "verificationMethod": {
-        "@id": "https://w3id.org/security#verificationMethod",
-        "@type": "@id"
-      }
-    }
+    "https://w3id.org/security/data-integrity/v2"
   ],
   "id": "urn:uuid:cdc77118-6bfa-11ec-aceb-10bf48838a41",
   "parentCapability": "urn:zcap:root:https%3A%2F%2Fexample.com%2Ffoo",
@@ -1189,79 +1166,6 @@ urn:uuid:{uuid}
           MUST NOT rely on such a proof to establish that a delegated zcap was
           created by a controller of its `parentCapability`.
         </p>
-
-        <p>
-          When a [=capability delegation proof=] is a `DataIntegrityProof`, the
-          delegated zcap's `@context` SHOULD define the terms that proof uses
-          directly, and SHOULD NOT include the Data Integrity context
-          `https://w3id.org/security/data-integrity/v2` in order to obtain
-          them.
-          The <a href="#zcap-v1-context">zcap v1 JSON-LD Context</a> already
-          defines `proof`, `expires`, `capabilityChain`,
-          `capabilityDelegation` and `capabilityInvocation`.
-          The terms a `DataIntegrityProof` adds to those are
-          `DataIntegrityProof` itself, `cryptosuite`, `created`,
-          `proofPurpose`, `proofValue` and `verificationMethod`, and defining
-          them as follows is sufficient:
-        </p>
-
-        <pre class="example highlight javascript">
-{
-  "@protected": true,
-  "DataIntegrityProof": "https://w3id.org/security#DataIntegrityProof",
-  "created": {
-    "@id": "http://purl.org/dc/terms/created",
-    "@type": "http://www.w3.org/2001/XMLSchema#dateTime"
-  },
-  "cryptosuite": {
-    "@id": "https://w3id.org/security#cryptosuite",
-    "@type": "https://w3id.org/security#cryptosuiteString"
-  },
-  "proofPurpose": {
-    "@id": "https://w3id.org/security#proofPurpose",
-    "@type": "@vocab"
-  },
-  "proofValue": {
-    "@id": "https://w3id.org/security#proofValue",
-    "@type": "https://w3id.org/security#multibase"
-  },
-  "verificationMethod": {
-    "@id": "https://w3id.org/security#verificationMethod",
-    "@type": "@id"
-  }
-}
-        </pre>
-
-        <p>
-          Each definition above is the one the Data Integrity context gives
-          for that term, so a zcap whose `@context` is the zcap v1 context
-          followed by the object above expands to the same RDF as the same zcap
-          whose `@context` is the zcap v1 context followed by the Data
-          Integrity context.
-          None of the six terms is defined by the zcap v1 context, so defining
-          them does not conflict with its protected terms.
-          `proofPurpose` needs no nested context: its `@type` of `@vocab`
-          expands its value against the active context, in which the zcap v1
-          context already defines `capabilityDelegation` and
-          `capabilityInvocation` as the same IRIs the Data Integrity context's
-          nested context does.
-        </p>
-
-        <div class="note">
-          <p>
-            The reason to prefer the definitions above to the context URL is
-            not size &mdash; the object is larger on the wire than the URL is.
-            It is that what a zcap means should not depend on a document this
-            specification does not control.
-            <a href="#zcap-v1-context">The zcap v1 JSON-LD Context</a> is
-            pinned here by its SHA2-256 digest and published alongside this
-            document; the Data Integrity context is neither, so including it
-            makes the meaning of a zcap depend on the content of a document at
-            a URL, and on whatever that document defines, which is more than a
-            zcap uses.
-          </p>
-        </div>
-
 
         <p>
           A capability delegator (one who creates a delegated zcap) may
